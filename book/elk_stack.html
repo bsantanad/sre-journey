@@ -1,0 +1,378 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>📈 ELK Stack - 🍎 SRE Journey</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> 🛶 Introduction</a></li><li class="chapter-item expanded "><a href="becoming_sre.html"><strong aria-hidden="true">2.</strong> 📚 Becoming SRE</a></li><li class="chapter-item expanded "><a href="k8s.html"><strong aria-hidden="true">3.</strong> 🚢 k8s</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running.html"><strong aria-hidden="true">3.1.</strong> 🐋 k8s up and running</a></li><li class="chapter-item expanded "><a href="k8s_personal_notes.html"><strong aria-hidden="true">3.2.</strong> ⛵️ k8s personal notes</a></li><li class="chapter-item expanded "><a href="k8s_cheatsheet.html"><strong aria-hidden="true">3.3.</strong> 📝 k8s cheatsheet</a></li></ol></li><li class="chapter-item expanded "><a href="elk_stack.html" class="active"><strong aria-hidden="true">4.</strong> 📈 ELK Stack</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">🍎 SRE Journey</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="-elastic-stack-elk"><a class="header" href="#-elastic-stack-elk">📈 Elastic Stack (ELK)</a></h1>
+<h1 id="table-of-contents"><a class="header" href="#table-of-contents">Table of contents</a></h1>
+<ul>
+<li><a href="#components">Components</a></li>
+<li><a href="#logstash">Logstash</a>
+<ul>
+<li><a href="#logstash-plugins">Logstash Plugins</a></li>
+<li><a href="#filters">Filters</a></li>
+<li><a href="#grokconstructor">GrokConstructor</a></li>
+</ul>
+</li>
+<li><a href="#beats">Beats</a></li>
+</ul>
+<p>ELK is great for <strong>Centralized Logging</strong>, this enable us to not waste time
+trying to find where the issues are, we have all in one place. We also can</p>
+<p>Kibana is the visualization of the ELK stack, you can visualize the data on
+real time.</p>
+<h1 id="components"><a class="header" href="#components">Components</a></h1>
+<p>It has several open source add-ons, but the main ones are these:</p>
+<ul>
+<li><strong>Beats</strong>:
+<ul>
+<li>Light weight way of getting data into the ELK stack.</li>
+<li>Single purpose tools.</li>
+</ul>
+</li>
+<li><strong>Logstash</strong>:
+<ul>
+<li>Transform data as it comes into structured data that will be stored.</li>
+<li>Very resource intensive</li>
+<li>Example: is like cutting carrots 🥕 as you get from the store and saving
+them to the fridge, instead of cutting them until you are about to cook</li>
+</ul>
+</li>
+<li><strong>Elasticsearch</strong>:
+<ul>
+<li>The part of the stack that stores the data itself</li>
+<li>Usually deployed by a cluster, it has redundant copies so it can work if
+something fails</li>
+</ul>
+</li>
+<li><strong>Kibana</strong>:
+<ul>
+<li>Web front end for the ELK stack</li>
+<li>Quick bird’s eye view across your infra</li>
+</ul>
+</li>
+</ul>
+<h1 id="logstash"><a class="header" href="#logstash">Logstash</a></h1>
+<p>Three block  of code in config</p>
+<ul>
+<li>Input: get data in</li>
+<li>Output put data somewhere, usually elasticsearch</li>
+<li>Filter block: where data is transformed and relocated, where we can parse
+lines.</li>
+</ul>
+<p>Example of config file.</p>
+<pre><code class="language-bash">input { stdin {} }
+
+filter {
+	mutate {
+		add_field =&gt; { "greeting" =&gt; "Hello %{message}" }
+	}
+}
+
+output { stdout {} }
+</code></pre>
+<p>This will take input from <code>STDIN</code> and output it to <code>STDOUT</code>, anything we type would be returned in a structured format with a <code>greeting</code> field.</p>
+<h2 id="logstash-plugins"><a class="header" href="#logstash-plugins">Logstash Plugins</a></h2>
+<p>It has more than 100 packages installed with logstash</p>
+<p><code>/usr/share/logstash/bin/logstash-plugins list</code> for listing them</p>
+<ul>
+<li>
+<p>Beats: Input plugin to work with <code>beats</code></p>
+<pre><code class="language-bash">input { beats { port =&gt; 5044 } }
+</code></pre>
+</li>
+<li>
+<p>File:</p>
+<ul>
+<li>Get input from a file, or multiple, you can use wildcards</li>
+</ul>
+<pre><code class="language-bash">input { file { path=&gt; "/var/log/kern.log" } }
+</code></pre>
+</li>
+<li>
+<p>elasticsearch</p>
+<ul>
+<li>this is an <strong>output</strong> plugin, you can point to multiple servers</li>
+</ul>
+<pre><code class="language-bash">output { elasticsearch { host =&gt; ["localhost:9200"] } }
+</code></pre>
+</li>
+</ul>
+<h2 id="filters"><a class="header" href="#filters">Filters</a></h2>
+<ul>
+<li>
+<p>Grok</p>
+<ul>
+<li>convert unstructured data to structured data</li>
+<li>based on regex, but it has many abstractions in case you want to use them</li>
+</ul>
+<pre><code class="language-bash">filter {
+	grok {
+		match =&gt; {
+			"message" =&gt; "%{IP:client} %{WORD:method} %{URIPATHPARAM}:request...."
+		}
+	}
+}
+</code></pre>
+</li>
+<li>
+<p>Mutate</p>
+<ul>
+<li>let you transform the data</li>
+</ul>
+<pre><code class="language-bash">filter {
+	grok {
+		match =&gt; {
+			"message" =&gt; "%{TIMESTAMP:t} new users: %{GREEDYDATA:users}"
+			# 2024-01-23 new users: jose,pedro,maria
+		}
+	}
+
+	mutate {
+		split =&gt; {"users" =&gt; ","}
+	}
+}
+</code></pre>
+<p>In this example <em>grok</em> will get the time stamp of the message and will get all the string after <code>new users:</code> then we use <em>mutate</em> to split the users and have it stored as a list so when the data shows up in elasticsearch it looks like an array</p>
+</li>
+</ul>
+<h2 id="grokconstructor"><a class="header" href="#grokconstructor">GrokConstructor</a></h2>
+<p><a href="http://grokconstructor.appspot.com">grokconstructor.appspot.com</a> Helper for creating grok filters.</p>
+<p>You can see also some <strong>grok patterns</strong> too.</p>
+<p>Basically you can paste the logs there build your filter from there</p>
+<p><img src="img/grok.png" alt="grok.png" /></p>
+<h1 id="beats"><a class="header" href="#beats">Beats</a></h1>
+<p>Why use beats? Logstash is overkill for a lot of things people use it for.</p>
+<p>It uses JRuby (basically ruby that runs on the JVM), and by default it is
+configured to set aside 1GiB of memory for the JVM. That is too much to just
+send things to Elastic</p>
+<p><strong>Beats</strong> (written in Go) is way more 🪽<strong>lightweight</strong>, it has been design to be. Becuase of this can be run everywhere.</p>
+<p>There are several beats</p>
+<ul>
+<li>Heartbeat (Uptime)</li>
+<li>Filebeat (Logs and text data)</li>
+<li>Metricbeat (Metrics)</li>
+<li>Packetbeat (Network data)</li>
+<li>Winlogbeat (Windows events logs)</li>
+<li>Auditbeat (audit logs and data)</li>
+<li>Functionbeat (serverless data)</li>
+</ul>
+<aside>
+💡 Note on Heartbeat (on opposed to other beats) run centrally and monitors
+servers, instead of the other way around.
+</aside>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="k8s_cheatsheet.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="k8s_cheatsheet.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

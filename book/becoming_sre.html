@@ -1,0 +1,763 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>📚 Becoming SRE - 🍎 SRE Journey</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> 🛶 Introduction</a></li><li class="chapter-item expanded "><a href="becoming_sre.html" class="active"><strong aria-hidden="true">2.</strong> 📚 Becoming SRE</a></li><li class="chapter-item expanded "><a href="k8s.html"><strong aria-hidden="true">3.</strong> 🚢 k8s</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running.html"><strong aria-hidden="true">3.1.</strong> 🐋 k8s up and running</a></li><li class="chapter-item expanded "><a href="k8s_personal_notes.html"><strong aria-hidden="true">3.2.</strong> ⛵️ k8s personal notes</a></li><li class="chapter-item expanded "><a href="k8s_cheatsheet.html"><strong aria-hidden="true">3.3.</strong> 📝 k8s cheatsheet</a></li></ol></li><li class="chapter-item expanded "><a href="elk_stack.html"><strong aria-hidden="true">4.</strong> 📈 ELK Stack</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">🍎 SRE Journey</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="becoming-sre"><a class="header" href="#becoming-sre">Becoming SRE</a></h1>
+<blockquote>
+<p>⚠️ These are notes taken from the book <a href="https://learning.oreilly.com/library/view/becoming-sre/9781492090540/"><em>Becoming SRE</em> by David N. Blank-Edelman
+O'Reilly</a>.
+It is an splendid book and no amount of notes I take will make it justice,
+<strong>please go read it and just use this as a reference</strong>.</p>
+</blockquote>
+<h1 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h1>
+<ul>
+<li><a href="#introduction-to-sre">Introduction to SRE</a>
+<ul>
+<li><a href="#first-things-first">First things first</a>
+<ul>
+<li><a href="#sre-vs-devops">SRE vs Devops</a></li>
+</ul>
+</li>
+<li><a href="#sre-mindset">SRE Mindset</a>
+<ul>
+<li><a href="#keeping-focus-on-the-customer">Keeping Focus on the Customer</a></li>
+<li><a href="#sres-relationship-with-failure">SRE’s Relationship with Failure</a></li>
+<li><a href="#the-mindset-in-motion">The Mindset in Motion</a></li>
+</ul>
+</li>
+<li><a href="#culture">Culture</a>
+<ul>
+<li><a href="#new-hires">New hires</a></li>
+<li><a href="#avoid">Avoid</a></li>
+<li><a href="#cool-ideas-to-improve-culture">Cool Ideas to improve culture</a></li>
+</ul>
+</li>
+<li><a href="#sre-advocacy">SRE Advocacy</a></li>
+</ul>
+</li>
+<li><a href="#becoming-sre-for-the-individual">Becoming SRE for the Individual</a>
+<ul>
+<li><a href="#preparing-to-be-an-sre">Preparing to be an SRE</a>
+<ul>
+<li><a href="#do-i-need-to-know-how-to-code-yes">Do I need to know how to code? Yes</a></li>
+<li><a href="#fundamentals">Fundamentals</a></li>
+<li><a href="#other-nice-to-have">Other nice to have</a></li>
+</ul>
+</li>
+<li><a href="#getting-to-sre-from">Getting to SRE from….</a>
+<ul>
+<li><a href="#from-devswe">From Dev/SWE</a></li>
+<li><a href="#from-sysadmin">From Sysadmin</a></li>
+<li><a href="#more-advice">More advice</a></li>
+</ul>
+</li>
+<li><a href="#hints-for-getting-hired-as-an-sre">Hints for Getting Hired as an SRE</a>
+<ul>
+<li><a href="#looking-closely-at-the-job-posting">Looking closely at the job posting</a></li>
+<li><a href="#preparing-for-an-sre-interview-resources">Preparing for an SRE interview (Resources)</a></li>
+<li><a href="#what-to-ask-at-the-sre-interview">What to ask at the SRE Interview</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="introduction-to-sre"><a class="header" href="#introduction-to-sre">Introduction to SRE</a></h1>
+<h2 id="first-things-first"><a class="header" href="#first-things-first">First things first</a></h2>
+<blockquote>
+<p>Site <strong>Reliability</strong> Engineering is an engineering discipline devoted to
+helpings orgs <strong>sustainably</strong> achieve the <strong>appropriate</strong> level of
+reliability in their systems, services and products.</p>
+</blockquote>
+<p>3 key words from definition</p>
+<ul>
+<li>Reliability: even  if you have the best software in the world, and the best
+sales team, if the sw is not up when customers need it, you lose a lot of:
+<ul>
+<li>Revenue</li>
+<li>Time</li>
+<li>Reputation</li>
+<li>Health</li>
+<li>Hiring</li>
+</ul>
+</li>
+<li>Appropriate
+<ul>
+<li>Usually 100% reliable is not achievable, it is likely that your
+dependencies are not 100% reliable.</li>
+<li>You need to use <em><strong>service level indicators/service level objectives</strong></em>
+(SLI/SLO) to help determine an appropriate level of reliability.</li>
+</ul>
+</li>
+<li>Sustainable
+<ul>
+<li>If the people in the org are burned out they wont be able to build
+reliable systems.</li>
+</ul>
+</li>
+</ul>
+<h3 id="sre-vs-devops"><a class="header" href="#sre-vs-devops">SRE vs Devops</a></h3>
+<ol>
+<li>
+<p>SRE implements class devops</p>
+</li>
+<li>
+<p>SRE is to reliability as devops is to delivery</p>
+</li>
+<li>
+<p>It’s all about the direction</p>
+<p><img src="img/sre-vs-devops.png" alt="sre-vs-devops.png" /> <em><a href="https://learning.oreilly.com/library/view/becoming-sre/9781492090540/">Source: Becoming SRE
+O'Reilly</a></em></p>
+</li>
+</ol>
+<ul>
+<li>Devops go from development to production operations</li>
+<li>SRE seems to start on prod operations, and going back to improve the result.</li>
+</ul>
+<p>Basically these two phrases:</p>
+<ul>
+<li>Devops thinks, how can I deploy this from my laptop to production</li>
+<li>SRE starts at production, how can I make the environment more reliable.</li>
+</ul>
+<h2 id="sre-mindset"><a class="header" href="#sre-mindset">SRE Mindset</a></h2>
+<p>It is born out of curiosity: <em>How does a system work? How does it fail?</em></p>
+<p>Zoom out and Zoom in as much as possible, how does the… work</p>
+<ul>
+<li>The whole app, development and deployment process</li>
+<li>The entire service</li>
+<li>The infrastructure</li>
+<li>The physical overlay of the infra</li>
+<li>The sociotechnical  context in which the infra runs</li>
+<li>The org context where the sociotechnical context resides in</li>
+</ul>
+<h3 id="keeping-focus-on-the-customer"><a class="header" href="#keeping-focus-on-the-customer">Keeping Focus on the Customer</a></h3>
+<p>Small example, say you have a 100 servers running a front end pool, suddenly 14
+systems fail and are not recovering.  This situation is:</p>
+<ol>
+<li>No big deal; you can deal with it at your leisure</li>
+<li>Something that warrants your immediate attentions. Stop what you are doing
+and focus on this</li>
+<li>Crisis, even if 2 AM go wake the CEO</li>
+</ol>
+<p>The answer, <em>it depends</em>, you need to ask, how does this affect the system as a
+whole. If the customers wont see anything diff then <strong>a.</strong> If visible by
+customers then <strong>b</strong>. If the service is dead in the water and this means no
+revenue, go wake the CEO.</p>
+<p>So basically you need to ask: <em>What is the intention of the system from the
+customer’s perspective?</em></p>
+<h3 id="sres-relationship-with-failure"><a class="header" href="#sres-relationship-with-failure">SRE’s Relationship with Failure</a></h3>
+<p>SRE are very collaborative. Reliability is a collaborative endeavour by nature.</p>
+<p>The SRE mindset views errors as an opportunity to learn. Learning from failure
+is a core component of an SRE.</p>
+<p>SRE treats errors as a signal and we like clear signals. With an SRE mindset
+errors can serve the helping understand the system better. This means we need
+to surface the errors in addition to eliminate them.</p>
+<p>SRE feels ownership of the whole service, t<strong>hey do not say often “not my code,
+not my problem”.</strong> This can be un <em>arma de doble filo.</em> Because of the <strong>yak
+shaving issue,</strong> where you go to do one task, say update a package, but then
+you check and for the new package you need to upgrade the OS, but to upgrade
+the OS you need to… and you end up with a trimmer in your hands and a yak
+infront of you. Taking ownership of the whole range of services and so on, can
+lead to this. **</p>
+<h3 id="the-mindset-in-motion"><a class="header" href="#the-mindset-in-motion">The Mindset in Motion</a></h3>
+<ul>
+<li>How does a system work? → How will the system work if we scale it?</li>
+<li>How does a system work? → How can the system work with less operational load
+<ul>
+<li>SREs are angered by <strong>toil</strong> and the almost allergic reaction it provokes
+in them.</li>
+</ul>
+</li>
+<li>How does a system work? → How can the system work reliable for more people</li>
+</ul>
+<h2 id="culture"><a class="header" href="#culture">Culture</a></h2>
+<p>Support an enviorment where SREs can thrive.</p>
+<ul>
+<li>Celebrate the elimination of toil, give SREs opportunity to look for toil and
+come up with ideas on how to remove it.</li>
+<li>Support curosity</li>
+</ul>
+<p>Other good way is to support the creation of documentation “it is not finished
+until it is documented”</p>
+<h3 id="new-hires"><a class="header" href="#new-hires">New hires</a></h3>
+<p>For new hires good some good tasks are:</p>
+<ul>
+<li>Find something unclear, missing or in some way needing improvment on the docs
+and fix it.
+<ul>
+<li>This has the benefit that they need to interact with the docs and read
+it, at a deep enough level that they can improve it.</li>
+</ul>
+</li>
+<li>Taking our inline database of all systems on our network, and make sure it
+was correct by visiting the locations</li>
+</ul>
+<h3 id="avoid"><a class="header" href="#avoid">Avoid</a></h3>
+<p>How to avoid the incident-handling train of the SRE will always fix everything.</p>
+<p>A good question to anwser is “Who is getting smarter and what are we doing
+about it?” The ideal would be that you are getting good new info about your
+systems and how they fail.</p>
+<p>But if just the SREs are the ones that are learning, you are in reverse, you
+are going the opposite direction of culture you are hoping to create.</p>
+<p>If the answer is close to: SREs, engineering personnel and relevant stake
+holders, you can go to the next question, What is the rest of the org doing
+with this knowledge?.</p>
+<h3 id="cool-ideas-to-improve-culture"><a class="header" href="#cool-ideas-to-improve-culture"><strong>Cool Ideas to improve culture</strong></a></h3>
+<ul>
+<li>Start a <strong>postmortem group</strong>,
+<ul>
+<li>Where someone does a writeup of an issue/outage that happened. Give it in
+advance before the meeting, and discuss what could have been done diff,
+or proposal on the arch, stuff like that.
+<ul>
+<li>Good first questions are:
+<ul>
+<li>What is missing from the write-up we have here?</li>
+<li>What do we still not  know, or what may we never know?</li>
+<li>Why wasn’t this worse?</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="sre-advocacy"><a class="header" href="#sre-advocacy">SRE Advocacy</a></h2>
+<aside> 💡 Side-note: If applying to a job, in the interview process, pay
+attention to how **well they are able to articulate their SRE story in the
+hiring process.** </aside>
+<p>There are two times where SRE Advocacy is most imporant</p>
+<ul>
+<li>early stages: you need to be able to tell people why they need an SRE</li>
+<li>expansion phase: “Cool, you’ve been able to set up a new SRE group. Now you
+have to get others to play with you. How do are you going to do that?”</li>
+</ul>
+<p>Humans are weird to be story-receiving machines. Let’s go back to the
+definition</p>
+<blockquote>
+<p>Site reliability engineering is the discipline devoted to helping orgs
+sustainably achieve an appropriate level of reliability in their systems,
+services and products.</p>
+</blockquote>
+<p>You can tell stories about…</p>
+<ul>
+<li>Efficacy
+<ul>
+<li>Partner suffering with reliability issues, SRE got involved and helped
+with X, Y and Z and now they are in a better place.</li>
+</ul>
+</li>
+<li>Reputation
+<ul>
+<li>How famous company X adopted SRE</li>
+</ul>
+</li>
+<li>Possibility
+<ul>
+<li>How comparable company X adopted SRE, how it went, issues, how they
+overcame. If they can you can do it to</li>
+</ul>
+</li>
+<li>Surprise
+<ul>
+<li>Story about an outage and the surprising result or finding uncovered by
+SRE postmortem process</li>
+</ul>
+</li>
+<li>Transformation
+<ul>
+<li>how things use to be, but now we are in a better place</li>
+</ul>
+</li>
+<li>Puzzle
+<ul>
+<li>X was a situations that made no sense; here’s how we solved the mystery
+step by step</li>
+</ul>
+</li>
+</ul>
+<p>Keep notes on things that happen, the brain is bad at memory stuff.</p>
+<p>Add cliffhangers to your stories, “all pointed to human error, but something
+did not feel right..”</p>
+<p>“Here is how I failed and leveled up based on that experience”</p>
+<h1 id="becoming-sre-for-the-individual"><a class="header" href="#becoming-sre-for-the-individual">Becoming SRE for the Individual</a></h1>
+<h2 id="preparing-to-be-an-sre"><a class="header" href="#preparing-to-be-an-sre">Preparing to be an SRE</a></h2>
+<p>This is not like super mandatory, but will help you a lot with being an SRE:</p>
+<h3 id="do-i-need-to-know-how-to-code-yes"><a class="header" href="#do-i-need-to-know-how-to-code-yes">Do I need to know how to code? <strong>Yes</strong></a></h3>
+<ul>
+<li>If you do not know how something is built your ability to understand it
+decreases</li>
+<li>Learning how to code will teach you how to debug/troubleshoot</li>
+<li>Many tools come in data formats that developers use in their day to day
+(JSON, YAML)</li>
+</ul>
+<h3 id="fundamentals"><a class="header" href="#fundamentals">Fundamentals</a></h3>
+<p>Is always good to know about the Big O notation, this will let know people you
+know about data structures and efficiency.</p>
+<ul>
+<li>Single/Basic Systems
+<ul>
+<li>You need to know how an OS works, about networking, permissions,
+protocols and how they fail.</li>
+</ul>
+</li>
+<li>Distributed Systems
+<ul>
+<li>Almost everything now is a distributed system</li>
+</ul>
+</li>
+<li>Statistics and Data Visualization
+<ul>
+<li>You need to understand and talk easily about, percentiles, standard
+statistical operations, aggregate and compound.</li>
+<li>The ability to improve reliability in most situations is predicated on
+how to have conversations about data</li>
+</ul>
+</li>
+<li>Storytelling
+<ul>
+<li>Post incidents reviews and post-mortems are literally tell a story</li>
+</ul>
+</li>
+<li>Be a good person</li>
+</ul>
+<h3 id="other-nice-to-have"><a class="header" href="#other-nice-to-have">Other nice to have</a></h3>
+<ul>
+<li>Non-Abstract Large System Design (NALSD)
+<ul>
+<li>Process of designing and reasoning about large systems</li>
+<li>Check <a href="http://highscalabilty.com">highscalabilty.com</a> and chapter 12 of
+The Site Reliability Workbook <a href="https://learning.oreilly.com/library/view/the-site-reliability/9781492029496/">oreilly
+book/</a>)</li>
+</ul>
+</li>
+<li>Resilience Engineering</li>
+<li>Chaos Engineering and Performance Engineering</li>
+<li>Machine Learning and Artificial Intelligence</li>
+</ul>
+<h2 id="getting-to-sre-from"><a class="header" href="#getting-to-sre-from">Getting to SRE from….</a></h2>
+<h3 id="from-devswe"><a class="header" href="#from-devswe">From Dev/SWE</a></h3>
+<p>You need to shift your focus to these areas:</p>
+<ul>
+<li>How does your code really function when in production?
+<ul>
+<li>How will it behave when the internet can throw any input at it.</li>
+<li>What happens if the connection to the DB is slower than in your dev env.</li>
+</ul>
+</li>
+<li>Failure nodes
+<ul>
+<li>Do you have a good sense on how your code fails?</li>
+<li>How can you tell when it is about to fail?</li>
+</ul>
+</li>
+<li>What have you built into the code to make figuring out whether your code is
+running well easy or possible?</li>
+<li>How easy have you made handle upgrades?
+<ul>
+<li>and rollbacks?</li>
+</ul>
+</li>
+<li>Have you written good docs on for an SRE audience?</li>
+</ul>
+<p>Basically: How much do you think about running your systems in additions to
+building them?</p>
+<h3 id="from-sysadmin"><a class="header" href="#from-sysadmin">From Sysadmin</a></h3>
+<p>Sysadmins live to serve, they bridge the gap between technology and the people
+that use it.</p>
+<p>You already have a good well-exercised skill for troubleshooting and debugging.</p>
+<p>Do exercises in SadServers, like leet code but for infrastructure.</p>
+<p>Change you mindset from “monitor all the things” to “measure reliability from
+the customer perspective, not the component perspective”</p>
+<p>Using terms like “contributing factors” instead of “root cause” can change both
+your internal and external way of looking at an issue. More on this on chapter
+10.</p>
+<p>Since you are already answering tickets, getting emails on things failing, you
+can start using that as a data set to start measure the reliability of the
+systems and how/why they fail.</p>
+<h3 id="more-advice"><a class="header" href="#more-advice">More advice</a></h3>
+<p>Do not forget to track your progress, so you have something to look at when
+they reject you from an interview, or when you feel indifference to your ideas.</p>
+<h2 id="hints-for-getting-hired-as-an-sre"><a class="header" href="#hints-for-getting-hired-as-an-sre"><strong>Hints for Getting Hired as an SRE</strong></a></h2>
+<p>Some general advice of getting hired as an SRE</p>
+<h3 id="looking-closely-at-the-job-posting"><a class="header" href="#looking-closely-at-the-job-posting">Looking closely at the job posting</a></h3>
+<p>Few thing to check:</p>
+<ul>
+<li>The tech mentioned
+<ul>
+<li>Modernity of the tech</li>
+<li>How items hand together
+<ul>
+<li>k8s/prometheus makes sense, k8s/nagios does not</li>
+</ul>
+</li>
+<li>Mention of Ticketing System
+<ul>
+<li>How quickly will things move in that env if its ticket based.</li>
+</ul>
+</li>
+<li>Specific versions of sw
+<ul>
+<li>they need a very specific thing</li>
+</ul>
+</li>
+<li>Mix of on-premise and cloud products
+<ul>
+<li>Are they all in the same env?</li>
+</ul>
+</li>
+<li>Mention of programming languages
+<ul>
+<li>Coding has meaning to them</li>
+</ul>
+</li>
+<li>Heavily skewed toward CI/CD and env provisioning tools
+<ul>
+<li>May have been a devops position, which is a diff mindset</li>
+</ul>
+</li>
+<li>Presence or absence of a monitoring tech
+<ul>
+<li>What connection if any would monitoring have to this role?</li>
+</ul>
+</li>
+<li>Services that are consumed
+<ul>
+<li>What am i getting into from dependencies perspective</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>The human connection
+<ul>
+<li>Look for an indication of the stakeholders or collaborators</li>
+</ul>
+</li>
+</ul>
+<p>Look for post-incidents reviews, they can be a helpful way of how they handle
+issues, what’s their SW stack and stuff like that. Do not bring that up in the
+interview unless they do.</p>
+<h3 id="preparing-for-an-sre-interview-resources"><a class="header" href="#preparing-for-an-sre-interview-resources">Preparing for an SRE interview (Resources)</a></h3>
+<p>Depends (of course) of the posting, it could be more SWE focus, or CI/CD focus,
+but there are four things you need to study for the interviews:</p>
+<ul>
+<li>
+<p><em><strong>NALSD (non-abstract large system design)</strong></em></p>
+<p>For systems that require scale (most of them)</p>
+<p>Resources:</p>
+<ul>
+<li><em>The Site Reliability Workbook</em> has a lovely chapter on the topic.</li>
+<li>There are a lot of talks on the topic <a href="https://www.youtube.com/@UsenixOrg">USENIX</a></li>
+<li>Google has a public classroom for this
+<a href="https://sre.google/classroom/">https://sre.google/classroom/</a></li>
+</ul>
+</li>
+<li>
+<p><em><strong>Monitoring/observability</strong></em></p>
+<p>Good places to start:</p>
+<ul>
+<li><em>Practical Monitoring</em> by Mike Julian (O’Reilly, 2017)</li>
+<li><em>Observability Engineering</em> books by Charity Majors et al. (all from
+O’Reilly)</li>
+</ul>
+<p>If you expect to talk about SLIs and SLOs review</p>
+<ul>
+<li><em>Implementing Service Level Objectives</em>(O’Reilly, 2020).</li>
+</ul>
+</li>
+<li>
+<p><em><strong>Computing Fundamentals</strong></em></p>
+<ul>
+<li>Computer science, computer networks, linux, distributed computing, stuff
+like that.</li>
+</ul>
+</li>
+<li>
+<p><em><strong>Troubleshooting and debugging</strong></em></p>
+<ul>
+<li>Hopefully you have experience with this one, but
+<a href="http://sadservers.com">sadservers.com</a> is a good start</li>
+</ul>
+</li>
+</ul>
+<h3 id="what-to-ask-at-the-sre-interview"><a class="header" href="#what-to-ask-at-the-sre-interview">What to ask at the SRE Interview</a></h3>
+<p>Some good conversation starters:</p>
+<ul>
+<li>
+<p><strong>Tell me about your monitoring system</strong></p>
+<p>This exposes all sort of info on organization, structure, collaboration,
+ownership, How decision are made, and so on.</p>
+<p>Some follow up questions:</p>
+<ul>
+<li>Who owns monitoring in your org?</li>
+<li>How many monitoring systems are there in active use?</li>
+<li>Who (apps/services/teams) send data to those systems, and who access
+them?</li>
+<li>How easy it is to onboard a new app/service to your monitoring?</li>
+<li>What decisions are made using the data?</li>
+<li>Are there alerts generated fromt his system?</li>
+<li>What makes you happy and unhappy with your current system?</li>
+</ul>
+</li>
+<li>
+<p><strong>Tell me about your post-incidents review process</strong></p>
+<p>Here you are trying to see how intentional are they on learning from
+failure</p>
+<ul>
+<li>Do you hold post-incidents review after your outages?</li>
+<li>What is their purpose?</li>
+<li>Who is “in the room” for them?</li>
+<li>How do you document your outages?</li>
+<li>Can you tell me (at whatever level of details you are comfortable) about
+a recent outage</li>
+<li>Do you have a sense of the most common classes of outage you have seen in
+the last N month? (config related, overload/resource-deprivation
+failures, code bug)</li>
+</ul>
+</li>
+<li>
+<p><strong>Tell me about you on-call setup</strong></p>
+<ul>
+<li>Do people get time off after incidents?</li>
+<li>Who in the org participates in an on-call rotation (just SREs? Devs?
+Managers?)</li>
+<li>When was the last time you personally were “paged”?</li>
+<li>Do people get paged equally often between work and off-work hours?</li>
+</ul>
+</li>
+<li>
+<p><strong>What problem does SRE exist to address in your org?</strong></p>
+<ul>
+<li>If they cannot answer that: What are some ‘recent wins’ by SRE in the
+past 6 to 12 months?</li>
+</ul>
+</li>
+<li>
+<p><strong>Can SREs check in code to major repos in your org?</strong></p>
+<ul>
+<li>You’ll see how involved is the SRE with dev work</li>
+</ul>
+</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="k8s.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="k8s.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
