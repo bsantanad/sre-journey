@@ -1,0 +1,10 @@
+[book]
+authors = ["bsantanad"]
+language = "en"
+multilingual = false
+src = "src"
+title = "🍎 SRE Journey"
+
+[preprocessor.toc]
+command = "mdbook-toc"
+renderer = ["html"]
