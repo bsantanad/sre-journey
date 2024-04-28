@@ -405,3 +405,111 @@ Some good conversation starters:
       past 6 to 12 months?
 - **Can SREs check in code to major repos in your org?**
     - You’ll see how involved is the SRE with dev work
+
+
+## A Day in the Life of an SRE
+
+Because of the nature of the SRE role, it is hard to describe an average day,
+since it most days are different to each other. So instead of an average day,
+we have different modes SREs can relate to. Look at it like different hats an
+SRE will wear
+
+* __Incident/Outage Mode__
+
+    There will be days were most of your time you will be involved dealing with
+    an accident. These days come with some feelings attached to them (fear,
+    anxiety, and so on), the intensity of these feelings depend on the severity
+    of the outage.
+
+    When on this mode you will be reacting not planning it is normal.
+
+* __Post-incident Learning Mode__
+
+    After the incident now you have the opportunity to review the memories of
+    an outage and learn from it.
+
+    You are responsible for documenting it, in a way others can understand it.
+    To do this you will have to investigate a bit, look for data in your
+    monitoring systems, talk to your colleagues to discover what they knew and
+    when.
+
+* __Builder/Project/Learn Mode__
+
+    This is when you actually have time to sit and...
+    - Devlop some code for services or SRE tasks
+    - Provision new envs or infra
+    - Improve monitoring/observability
+    - Removing toil
+    - Writing docs
+    - Learning a new tech in anticipation of using it some day
+
+    Of course, there will be times when you are doing boring stuff, but that
+    can help you identify toil you need to remove.
+
+* __Architecture Mode__
+
+    Depends on your org, but, and SRE should be showing up to design and
+    planning meetings where they are acting as a representative  for
+    reliability.
+
+    Be political about it, no one wants to hear, "_this would have never happen
+    if there was an SRE when this thing was designed_". Appeal to the sense
+    that everyone want to have their code in production be as reliable as
+    possible.
+
+* __Management Mode__
+
+    If the response to, _what did you do all day?_, was, _I went to meetings_,
+    do not worry, chances are you might be an SRE manager.
+
+* __Planning Mode__
+
+    Some portion of your day will be planning.
+    - Implementation plans
+    - Capacity planning
+    - Self-definitional work (goals of SRE team and stuff like that)
+
+
+* __Collaboration Mode__
+
+    <mark> The SRE role is relentlessly collaborative.</mark>
+
+    When you implement SLI/SLO (Service Level Indicators/Service Level
+    Objectives) you will be working with: devs, PMs, stakeholders.
+
+    Another example of collaborative work, is what some people call pre-launch
+    review. An SRE gets involved to revise the service being deployed in
+    production, what is necessary for it to run reliably in production
+
+    Do not be a gatekeeper, share this work with the devs and the stakeholders,
+    collaborate as much as possible
+
+    Finally, listen to the customers through monitoring work. The SLIs/SLOs
+    (Service Level Indicators, Service Level Objectives) are meant to provide
+    ongoing collaboration with the customer.
+
+* __Recovery and Self-Care Mode__
+
+    Burn out SREs are of no good to anyone. Because of the nature of SREs it
+    can be easy to overextending yourself. But when we hear that someone is
+    regularly working 60-75 hours, is not something to be proud of, that means
+    there is a failure in the system and needs to be fixed.
+
+    You need to have recovery time.
+
+* __On Balance__
+
+    Balance is something good to strive for, but there are often situational
+    factors  that complicate the effort, for example, an _early service_ vs _mature
+    service_, new services are always noisier and require more reactive work. They
+    also provide more toil to be stripped away, so maybe you expend more time in
+    one of these modes than in others.
+
+    The idea is to see this as weather patterns, I know it is going to rain hard
+    for some time, but I mentally prepare. Ideally things will level out. If not,
+    you need to strive for it. SRE attempts to be a **sustainable** operations
+    practice. If you realise this cannot be sustained maybe you need to start
+    looking for a different job.
+
+
+## Establishing a Relationship to Toil
