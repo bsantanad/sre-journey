@@ -12,7 +12,7 @@ Some useful commands
 > kind create cluster
 > ```
 
-# General
+# Describe Cluster
 
 - Check version
     
