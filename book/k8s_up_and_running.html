@@ -174,18 +174,34 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="-k8s-up-and-running"><a class="header" href="#-k8s-up-and-running">🐋 k8s up and running</a></h1>
+<blockquote>
+<p>⚠️ These are notes taken from the book <a href="https://learning.oreilly.com/library/view/kubernetes-up-and/9781098110192"><em>Kubernetes Up and Running by Brendan
+Burns, Joe Beda, and Kelsey Hightower O'Reilly</em></a>.
+<strong>Please go read it and just use this as reference</strong>.</p>
+</blockquote>
 <h1 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h1>
 <ul>
 <li><a href="#introduction">Introduction</a>
 <ul>
 <li><a href="#development-velocity">Development Velocity</a></li>
-<li><a href="#scaling-your-service-and-your-teams">Scaling Your Service and Your Teams</a></li>
+<li><a href="#scaling-your-service-and-your-teams">Scaling Your Service and Your Teams</a>
+<ul>
+<li><a href="#decoupling">Decoupling</a></li>
+<li><a href="#scaling-for-applications-and-clusters">Scaling for Applications and Clusters</a></li>
+<li><a href="#scaling-development-teams">Scaling Development Teams</a></li>
+<li><a href="#separation-of-concerns-for-consistency-and-scaling">Separation of Concerns for Consistency and Scaling</a></li>
+</ul>
+</li>
+<li><a href="#abstracting-you-infrastructure">Abstracting You Infrastructure</a></li>
+<li><a href="#efficiency">Efficiency</a></li>
+<li><a href="#cloud-native-ecosystem">Cloud Native Ecosystem</a></li>
+<li><a href="#summary">Summary</a></li>
 </ul>
 </li>
 <li><a href="#deploying-a-k8s-cluster">Deploying a k8s cluster</a></li>
 </ul>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
-<aside> 
+<aside>
 💡 K8s is an open source orchestrator for deploying containerized applications
 </aside>
 <p>It has become the standard API for building cloud native applications. It
@@ -228,7 +244,7 @@ image with the version of vim you want, destroy the old one, and create a
 container with the new one.</p>
 <p>This makes rollbacks way easier, and it keeps tracks of what changed from
 version to version.</p>
-  <aside> 
+  <aside>
   💡 Imperatively change running containers (going into the container and
   update a package for example) is an anti-pattern, and should be avoided.
   </aside>
@@ -253,12 +269,86 @@ against any failures that might destabilize it.</p>
 </li>
 </ul>
 <h2 id="scaling-your-service-and-your-teams"><a class="header" href="#scaling-your-service-and-your-teams">Scaling Your Service and Your Teams</a></h2>
-<p>WIP</p>
+<p>K8s is great for scaling because of its decoupled architecture.</p>
+<h3 id="decoupling"><a class="header" href="#decoupling">Decoupling</a></h3>
+<p>In a decoupled architecture each components is separated from each other by
+defined APIs and service loads</p>
+<p>This basically means that we can isolate each service.</p>
+<ul>
+<li>The API provide a buffer between implementer and consumer.</li>
+<li>Load balancing provide a buffer between running instances of each service.</li>
+</ul>
+<p>When we decouple the services, it makes it easier to scale, since each small
+team can focus on a single <em>microservice</em></p>
+<h3 id="scaling-for-applications-and-clusters"><a class="header" href="#scaling-for-applications-and-clusters">Scaling for Applications and Clusters</a></h3>
+<p>Since your app is deployed in containers, which are immutable, and th
+configuration o  is also declarative, scaling simply becomes a matter of
+changing a number in a configuration file. Or you can even tell k8s to do that
+for you.</p>
+<p>Of course k8s will be limited to the resources you have, it will not create a
+physical computer on demand. But k8s makes it easier to scale the cluster
+itself as well.</p>
+<p>Since a set of machines in a cluster are identical and the apps are decoupled
+from the specifics of the machine by containers, scaling a cluster is just a
+matter of provisioning the system and joining it to a cluster.</p>
+<p>K8s can also come in handy when trying to forecast costs on growth and scaling.
+Basically, if you have different apps that need to scale from many teams, you
+can aggregate them all in a single k8s, and try to forecast the usage of the 3
+apps together.</p>
+<h3 id="scaling-development-teams"><a class="header" href="#scaling-development-teams">Scaling Development Teams</a></h3>
+<p>Teams are ideal when using the two-pizza team when (6 to 8 people), larger
+teams tend to have issues of hierarchy, poor visibility, infighting and so on.</p>
+<p>K8s can help with that, since you can have multiple small teams working on
+different microservices and  aggregate them all into a single k8s cluster.</p>
+<p>K8s has different abstractions that make it easier to build decoupled
+microservices.</p>
+<ul>
+<li><strong>pods</strong>: are groups of containers, can contain images developed by different
+teams into a single deployable unit.</li>
+<li><strong>k8s services</strong>: provide load balancing, naming and discovery to isolate the
+microservices.</li>
+<li><strong>namespaces</strong>: provide isolation and access control, so that each microservice
+can control the degree to which other services interact with it.</li>
+<li><strong>ingress</strong>: easy to use front end that can combine microservices into a single
+API.</li>
+</ul>
+<h3 id="separation-of-concerns-for-consistency-and-scaling"><a class="header" href="#separation-of-concerns-for-consistency-and-scaling">Separation of Concerns for Consistency and Scaling</a></h3>
+<p>K8s leads to greater consistency for the lower levels of the infrastructure.
+Basically the devs need to only worry about their app meeting the SLA (service
+level agreements) while the orchestration admin only need to worry about
+reaching the SLA from their side.</p>
+<h2 id="abstracting-you-infrastructure"><a class="header" href="#abstracting-you-infrastructure">Abstracting You Infrastructure</a></h2>
+<p>When you build your app in terms of containers and deploy it via k8s APIs, you
+make moving your app between environments super easy. It is simply a question
+of sending the declarative config to a new cluster.</p>
+<p>K8s make building deploying and managing your app truly portable across a wide
+variety of environments</p>
+<h2 id="efficiency"><a class="header" href="#efficiency">Efficiency</a></h2>
+<p>Efficiency is measured by the ratio of the useful work performed by a machine.</p>
+<p>K8s enables efficiency in multiple ways. Since developers do not need to use a
+whole machine for himself/herself, but rather one container, multiple users can
+share the same baremetal. Meaning less idle CPUs.</p>
+<h2 id="cloud-native-ecosystem"><a class="header" href="#cloud-native-ecosystem">Cloud Native Ecosystem</a></h2>
+<p>K8s is open source and has a huge community building a thousand things on top
+of it. You can check the maturity of different projects in Cloud Native
+Computing Foundation. The maturities are sandbox incubating and graduated,
+going from less mature to most mature.</p>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>Fundamentally k8s was design to give developers more velocity efficiency and
+agility. Now that we have seen why to use it, lets see how to use it.</p>
 <h1 id="deploying-a-k8s-cluster"><a class="header" href="#deploying-a-k8s-cluster">Deploying a k8s cluster</a></h1>
 <p>You can use a cloud provider, deploying on  bare-metal quite hard, other good
-alternatives
-<a href="http://kind.sigs.k8s.io/docs/user/configuration/">http://kind.sigs.k8s.io</a>
+alternatives.</p>
+<p><a href="http://kind.sigs.k8s.io/docs/user/configuration/">http://kind.sigs.k8s.io</a>
 that has a really cool logo, and works on using containers for the nodes.</p>
+<p>Go check the pages of cloud providers on how to deploy it there since it will
+change depending on the provider.</p>
+<p>One thing to bare in mind is that in order to use <code>kubectl</code> with your cluster
+you need a <code>~/.kube/config</code> file, probably your cloud provider will give that
+to you.</p>
+<p>Also you can go to <a href="/k8s_cheatsheet.html#describe-cluster">k8s cheatsheet (describe
+cluster)</a> to see the basics commands on
+describing a cluster.</p>
 
                     </main>
 
