@@ -229,6 +229,8 @@ It is an splendid book and no amount of notes I take will make it justice,
 <li><a href="#what-to-ask-at-the-sre-interview">What to ask at the SRE Interview</a></li>
 </ul>
 </li>
+<li><a href="#a-day-in-the-life-of-an-sre">A Day in the Life of an SRE</a></li>
+<li><a href="#establishing-a-relationship-to-toil">Establishing a Relationship to Toil</a></li>
 </ul>
 </li>
 </ul>
@@ -709,6 +711,104 @@ past 6 to 12 months?</li>
 </ul>
 </li>
 </ul>
+<h2 id="a-day-in-the-life-of-an-sre"><a class="header" href="#a-day-in-the-life-of-an-sre">A Day in the Life of an SRE</a></h2>
+<p>Because of the nature of the SRE role, it is hard to describe an average day,
+since it most days are different to each other. So instead of an average day,
+we have different modes SREs can relate to. Look at it like different hats an
+SRE will wear</p>
+<ul>
+<li>
+<p><strong>Incident/Outage Mode</strong></p>
+<p>There will be days were most of your time you will be involved dealing with
+an accident. These days come with some feelings attached to them (fear,
+anxiety, and so on), the intensity of these feelings depend on the severity
+of the outage.</p>
+<p>When on this mode you will be reacting not planning it is normal.</p>
+</li>
+<li>
+<p><strong>Post-incident Learning Mode</strong></p>
+<p>After the incident now you have the opportunity to review the memories of
+an outage and learn from it.</p>
+<p>You are responsible for documenting it, in a way others can understand it.
+To do this you will have to investigate a bit, look for data in your
+monitoring systems, talk to your colleagues to discover what they knew and
+when.</p>
+</li>
+<li>
+<p><strong>Builder/Project/Learn Mode</strong></p>
+<p>This is when you actually have time to sit and...</p>
+<ul>
+<li>Devlop some code for services or SRE tasks</li>
+<li>Provision new envs or infra</li>
+<li>Improve monitoring/observability</li>
+<li>Removing toil</li>
+<li>Writing docs</li>
+<li>Learning a new tech in anticipation of using it some day</li>
+</ul>
+<p>Of course, there will be times when you are doing boring stuff, but that
+can help you identify toil you need to remove.</p>
+</li>
+<li>
+<p><strong>Architecture Mode</strong></p>
+<p>Depends on your org, but, and SRE should be showing up to design and
+planning meetings where they are acting as a representative  for
+reliability.</p>
+<p>Be political about it, no one wants to hear, "<em>this would have never happen
+if there was an SRE when this thing was designed</em>". Appeal to the sense
+that everyone want to have their code in production be as reliable as
+possible.</p>
+</li>
+<li>
+<p><strong>Management Mode</strong></p>
+<p>If the response to, <em>what did you do all day?</em>, was, <em>I went to meetings</em>,
+do not worry, chances are you might be an SRE manager.</p>
+</li>
+<li>
+<p><strong>Planning Mode</strong></p>
+<p>Some portion of your day will be planning.</p>
+<ul>
+<li>Implementation plans</li>
+<li>Capacity planning</li>
+<li>Self-definitional work (goals of SRE team and stuff like that)</li>
+</ul>
+</li>
+<li>
+<p><strong>Collaboration Mode</strong></p>
+<p><mark> The SRE role is relentlessly collaborative.</mark></p>
+<p>When you implement SLI/SLO (Service Level Indicators/Service Level
+Objectives) you will be working with: devs, PMs, stakeholders.</p>
+<p>Another example of collaborative work, is what some people call pre-launch
+review. An SRE gets involved to revise the service being deployed in
+production, what is necessary for it to run reliably in production</p>
+<p>Do not be a gatekeeper, share this work with the devs and the stakeholders,
+collaborate as much as possible</p>
+<p>Finally, listen to the customers through monitoring work. The SLIs/SLOs
+(Service Level Indicators, Service Level Objectives) are meant to provide
+ongoing collaboration with the customer.</p>
+</li>
+<li>
+<p><strong>Recovery and Self-Care Mode</strong></p>
+<p>Burn out SREs are of no good to anyone. Because of the nature of SREs it
+can be easy to overextending yourself. But when we hear that someone is
+regularly working 60-75 hours, is not something to be proud of, that means
+there is a failure in the system and needs to be fixed.</p>
+<p>You need to have recovery time.</p>
+</li>
+<li>
+<p><strong>On Balance</strong></p>
+<p>Balance is something good to strive for, but there are often situational
+factors  that complicate the effort, for example, an <em>early service</em> vs <em>mature
+service</em>, new services are always noisier and require more reactive work. They
+also provide more toil to be stripped away, so maybe you expend more time in
+one of these modes than in others.</p>
+<p>The idea is to see this as weather patterns, I know it is going to rain hard
+for some time, but I mentally prepare. Ideally things will level out. If not,
+you need to strive for it. SRE attempts to be a <strong>sustainable</strong> operations
+practice. If you realise this cannot be sustained maybe you need to start
+looking for a different job.</p>
+</li>
+</ul>
+<h2 id="establishing-a-relationship-to-toil"><a class="header" href="#establishing-a-relationship-to-toil">Establishing a Relationship to Toil</a></h2>
 
                     </main>
 
