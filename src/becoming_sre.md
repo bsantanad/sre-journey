@@ -9,7 +9,7 @@
 # Table of Contents
 <!-- toc -->
 
-# Introduction to SRE 
+# Introduction to SRE
 
 ## First things first
 > Site **Reliability** Engineering is an engineering discipline devoted to
@@ -39,10 +39,10 @@
 1. SRE implements class devops
 2. SRE is to reliability as devops is to delivery
 3. It’s all about the direction
-    
+
     ![sre-vs-devops.png](img/sre-vs-devops.png) _[Source: Becoming SRE
     O'Reilly](https://learning.oreilly.com/library/view/becoming-sre/9781492090540/)_
-    
+
 
 - Devops go from development to production operations
 - SRE seems to start on prod operations, and going back to improve the result.
@@ -54,7 +54,7 @@ Basically these two phrases:
 
 ## SRE Mindset
 
-It is born out of curiosity: *How does a system work? How does it fail?* 
+It is born out of curiosity: *How does a system work? How does it fail?*
 
 Zoom out and Zoom in as much as possible, how does the… work
 
@@ -85,10 +85,10 @@ customer’s perspective?*
 
 ### SRE’s Relationship with Failure
 
-SRE are very collaborative. Reliability is a collaborative endeavour by nature. 
+SRE are very collaborative. Reliability is a collaborative endeavour by nature.
 
 The SRE mindset views errors as an opportunity to learn. Learning from failure
-is a core component of an SRE. 
+is a core component of an SRE.
 
 SRE treats errors as a signal and we like clear signals. With an SRE mindset
 errors can serve the helping understand the system better. This means we need
@@ -112,7 +112,7 @@ lead to this. **
 
 ## Culture
 
-Support an enviorment where SREs can thrive. 
+Support an enviorment where SREs can thrive.
 
 - Celebrate the elimination of toil, give SREs opportunity to look for toil and
   come up with ideas on how to remove it.
@@ -134,7 +134,7 @@ For new hires good some good tasks are:
 
 ### Avoid
 
-How to avoid the incident-handling train of the SRE will always fix everything. 
+How to avoid the incident-handling train of the SRE will always fix everything.
 
 A good question to anwser is “Who is getting smarter and what are we doing
 about it?” The ideal would be that you are getting good new info about your
@@ -176,7 +176,7 @@ definition
 > Site reliability engineering is the discipline devoted to helping orgs
 > sustainably achieve an appropriate level of reliability in their systems,
 > services and products.
-> 
+>
 
 You can tell stories about…
 
@@ -272,7 +272,7 @@ building them?
 ### From Sysadmin
 
 Sysadmins live to serve, they bridge the gap between technology and the people
-that use it. 
+that use it.
 
 You already have a good well-exercised skill for troubleshooting and debugging.
 
@@ -283,11 +283,11 @@ the customer perspective, not the component perspective”
 
 Using terms like “contributing factors” instead of “root cause” can change both
 your internal and external way of looking at an issue. More on this on chapter
-10. 
+10.
 
 Since you are already answering tickets, getting emails on things failing, you
 can start using that as a data set to start measure the reliability of the
-systems and how/why they fail. 
+systems and how/why they fail.
 
 ### More advice
 
@@ -333,26 +333,26 @@ Depends (of course) of the posting, it could be more SWE focus, or CI/CD focus,
 but there are four things you need to study for the interviews:
 
 - ***NALSD (non-abstract large system design)***
-    
+
     For systems that require scale (most of them)
-    
+
     Resources:
-    
+
     - *The Site Reliability Workbook* has a lovely chapter on the topic.
     - There are a lot of talks on the topic [USENIX](https://www.youtube.com/@UsenixOrg)
     - Google has a public classroom for this
       [https://sre.google/classroom/](https://sre.google/classroom/)
 
 - ***Monitoring/observability***
-    
+
     Good places to start:
-    
+
     - *Practical Monitoring* by Mike Julian (O’Reilly, 2017)
     - *Observability Engineering* books by Charity Majors et al. (all from
       O’Reilly)
-    
+
     If you expect to talk about SLIs and SLOs review
-    
+
     - *Implementing Service Level Objectives*(O’Reilly, 2020).
 - ***Computing Fundamentals***
     - Computer science, computer networks, linux, distributed computing, stuff
@@ -366,12 +366,12 @@ but there are four things you need to study for the interviews:
 Some good conversation starters:
 
 - **Tell me about your monitoring system**
-    
+
     This exposes all sort of info on organization, structure, collaboration,
     ownership, How decision are made, and so on.
-    
+
     Some follow up questions:
-    
+
     - Who owns monitoring in your org?
     - How many monitoring systems are there in active use?
     - Who (apps/services/teams) send data to those systems, and who access
@@ -381,10 +381,10 @@ Some good conversation starters:
     - Are there alerts generated fromt his system?
     - What makes you happy and unhappy with your current system?
 - **Tell me about your post-incidents review process**
-    
+
     Here you are trying to see how intentional are they on learning from
     failure
-    
+
     - Do you hold post-incidents review after your outages?
     - What is their purpose?
     - Who is “in the room” for them?
