@@ -195,21 +195,21 @@ Server Version: v1.29.2*
 </li>
 <li>
 <p>Check cluster status</p>
-<pre><code class="language-bash">% k get componentstatuses # will be deprectated 
+<pre><code class="language-bash">% k get componentstatuses # will be deprectated
 Warning: v1 ComponentStatus is deprecated in v1.19+
 NAME                 STATUS    MESSAGE   ERROR
-controller-manager   Healthy   ok        
-scheduler            Healthy   ok        
-etcd-0               Healthy   ok  
+controller-manager   Healthy   ok
+scheduler            Healthy   ok
+etcd-0               Healthy   ok
 </code></pre>
 <p>or talk directly to the endpoint</p>
-<pre><code class="language-bash">% k get --raw='/readyz?verbose' 
+<pre><code class="language-bash">% k get --raw='/readyz?verbose'
 [+]ping ok
 [+]log ok
 [+]etcd ok
 [+]etcd-readiness ok
 [+]informer-sync ok
- # more messages 
+ # more messages
  readyz check passed
 </code></pre>
 </li>
@@ -223,6 +223,31 @@ node01               Ready   &lt;none&gt;          13s   v1.29.2
 <p>In k8s nodes are separated into <code>control-panel</code> nodes, like the API server,
 scheduler, etc. which manage the cluster, and <code>worker</code> nodes where your
 containers will run.</p>
+</li>
+<li>
+<p>Get more information about a specific node (prints bunch of info)</p>
+<pre><code class="language-bash">% k describe nodes kind-control-plane
+</code></pre>
+<p>more info on the ouput
+<a href="/k8s_up_and_running.html#deploying-a-k8s-cluster">here</a></p>
+</li>
+<li>
+<p>See the proxies if they are under the API object named DaemonSet</p>
+<pre><code class="language-bash">% k get daemonSets --namespace=kube-system kube-proxy
+</code></pre>
+</li>
+<li>
+<p>See DNS k8s deployment</p>
+<pre><code class="language-bash">% k get deployments --namespace=kube-system coredns
+</code></pre>
+</li>
+<li>
+<p>Wait for nodes to be ready</p>
+<pre><code class="language-bash">% k wait --for=condition=Ready nodes --all
+node/node1 condition met
+node/node2 condition met
+...
+</code></pre>
 </li>
 </ul>
 

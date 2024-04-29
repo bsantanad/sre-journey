@@ -848,7 +848,22 @@ Burns, Joe Beda, and Kelsey Hightower O'Reilly</em></a>.
 <li><a href="k8s_up_and_running.html#summary">Summary</a></li>
 </ul>
 </li>
-<li><a href="k8s_up_and_running.html#deploying-a-k8s-cluster">Deploying a k8s cluster</a></li>
+<li><a href="k8s_up_and_running.html#deploying-a-k8s-cluster">Deploying a k8s cluster</a>
+<ul>
+<li><a href="k8s_up_and_running.html#cluster-components">Cluster Components</a></li>
+</ul>
+</li>
+<li><a href="k8s_up_and_running.html#common-kubectl-commands">Common <code>kubectl</code> commands</a>
+<ul>
+<li><a href="k8s_up_and_running.html#namespaces">Namespaces</a></li>
+<li><a href="k8s_up_and_running.html#contexts">Contexts</a></li>
+<li><a href="k8s_up_and_running.html#viewing-k8s-api-objects">Viewing k8s API Objects</a></li>
+<li><a href="k8s_up_and_running.html#creating-updating-and-destroying-k8s-objects">Creating, updating and destroying k8s objects</a></li>
+<li><a href="k8s_up_and_running.html#labeling-and-annotating-objects">Labeling and Annotating Objects</a></li>
+<li><a href="k8s_up_and_running.html#debugging-commands">Debugging Commands</a></li>
+<li><a href="k8s_up_and_running.html#cluster-management">Cluster Management</a></li>
+</ul>
+</li>
 </ul>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
 <aside>
@@ -999,6 +1014,227 @@ to you.</p>
 <p>Also you can go to <a href="/k8s_cheatsheet.html#describe-cluster">k8s cheatsheet (describe
 cluster)</a> to see the basics commands on
 describing a cluster.</p>
+<p>I will  just cover some of the commands here, like</p>
+<pre><code class="language-bash">k describe nodes &lt;node name&gt;
+</code></pre>
+<p>At the top you can see basic node info:</p>
+<pre><code>Name:               kind-control-plane
+Roles:              control-plane
+Labels:             beta.kubernetes.io/arch=arm64
+                    beta.kubernetes.io/os=linux
+                    kubernetes.io/arch=arm64
+</code></pre>
+<p>We can see that it is linux on ARM</p>
+<p>Next we can see info about the operation of the node</p>
+<pre><code>Conditions:
+Type             Status  LastHeartbeatTime  LastTransitionTime Reason                       Message
+----             ------  -----------------  ------------------ ------                       -------
+MemoryPressure   False   29 Apr 2024        29 Apr 2024        KubeletHasSufficientMemory   kubelet has sufficient memory available
+DiskPressure     False   29 Apr 2024        29 Apr 2024        KubeletHasNoDiskPressure     kubelet has no disk pressure
+PIDPressure      False   29 Apr 2024        29 Apr 2024        KubeletHasSufficientPID      kubelet has sufficient PID available
+Ready            True    29 Apr 2024        29 Apr 2024        KubeletReady                 kubelet is posting ready status
+</code></pre>
+<p>Here we can see that the node is Ready, that it has sufficient memory, it has
+no disk pressure, and that is has sufficient PID.</p>
+<p>Then we see info about the capacity of the system.</p>
+<pre><code>Capacity:
+cpu:             1
+memory:          1933908Ki
+pods:            110
+Allocatable:
+cpu:             1
+memory:          1933908Ki
+pods:            110
+</code></pre>
+<p>Then info about software in the node like OS image, docker version all that.</p>
+<pre><code>System Info:
+# more stuff
+Kernel Version:             6.5.6-200.fc38.aarch64
+OS Image:                   Debian GNU/Linux 12 (bookworm)
+Operating System:           linux
+Architecture:               arm64
+Container Runtime Version:  containerd://1.7.13
+Kubelet Version:            v1.29.2
+Kube-Proxy Version:         v1.29.2
+</code></pre>
+<p>Then info about the pods running on the node:</p>
+<pre><code>Non-terminated Pods:          (9 in total)
+Namespace                   Name                                          CPU Requests  CPU Limits  Memory Requests  Memory Limits  Age
+---------                   ----                                          ------------  ----------  ---------------  -------------  ---
+kube-system                 coredns-76f75df574-92286                      100m (10%)    0 (0%)      70Mi (3%)        170Mi (9%)     23s
+kube-system                 coredns-76f75df574-m2z2k                      100m (10%)    0 (0%)      70Mi (3%)        170Mi (9%)     23s
+kube-system                 etcd-kind-control-plane                       100m (10%)    0 (0%)      100Mi (5%)       0 (0%)         39s
+kube-system                 kindnet-qm29d                                 100m (10%)    100m (10%)  50Mi (2%)        50Mi (2%)      23s
+kube-system                 kube-apiserver-kind-control-plane             250m (25%)    0 (0%)      0 (0%)           0 (0%)         39s
+# more stuff
+</code></pre>
+<p>We can see that k8s tracks both <code>requests</code> and upper <code>limits</code> for resource for
+each Pod. The difference is that resources requested by a pod are guaranteed to
+be present in the node, while pod's limit is the max amount of given resource
+that pod can consume</p>
+<h2 id="cluster-components"><a class="header" href="#cluster-components">Cluster Components</a></h2>
+<p>Many components that make up the k8s cluster are actually deployed using k8s
+itself. All of them run in the kube-system namespace</p>
+<ul>
+<li>
+<p>k8s proxy</p>
+<p>It routes network traffic to load-balanced services in the k8s cluster. It
+must be present on every node in the cluster</p>
+<pre><code class="language-bash">% k get daemonSets --namespace=kube-system kube-proxy
+</code></pre>
+</li>
+<li>
+<p>k8s dns</p>
+<p>provides naming and discover for the services that are defined in the
+cluster</p>
+<pre><code class="language-bash">% k get deployments --namespace=kube-system coredns
+</code></pre>
+</li>
+</ul>
+<h1 id="common-kubectl-commands"><a class="header" href="#common-kubectl-commands">Common <code>kubectl</code> commands</a></h1>
+<blockquote>
+<p>I will repeat the commands here and in the page: <a href="/k8s_cheatsheet.html">k8s
+cheatsheet</a> but I will go a bit more into detail here.
+I will also <code>alias k=kubectl</code></p>
+</blockquote>
+<p><code>kubectl</code> is the way you talk with k8s API. Here we will go over basic
+<code>kubectl</code> commands.</p>
+<h2 id="namespaces"><a class="header" href="#namespaces">Namespaces</a></h2>
+<p>Namespaces are like folders that hold a set of objects. They are used to
+organize the cluster.</p>
+<p>By default the <code>kubectl</code> command interacts with the <code>default</code> namespace, but
+you can specify which you want to use by <code>-n</code> or <code>--namespace=&lt;ns&gt;</code>.</p>
+<p>You can also use <code>--all-namespaces</code> flag to refer to all the ns.</p>
+<h2 id="contexts"><a class="header" href="#contexts">Contexts</a></h2>
+<p>If you want to change the namespaces in a more <em>permanent</em> way, you can use
+contexts. These get recorded in your <code>~/.kube/config</code> file. (That file also
+stores how to find and auth to your cluster)</p>
+<p>You can create a with a different default namespaces using</p>
+<pre><code class="language-bash">% kubectl config set-context my-context --namespace=mystuff
+</code></pre>
+<p>We need to tell <code>kubectl</code> to start using it.</p>
+<pre><code class="language-bash">% kubectl config use-context my-context
+</code></pre>
+<p>You can also use context to manage different clusters users for auth using
+<code>--users</code> or <code>--cluster</code> flags with <code>set-context</code> read the man for more info</p>
+<h2 id="viewing-k8s-api-objects"><a class="header" href="#viewing-k8s-api-objects">Viewing k8s API Objects</a></h2>
+<p>Basically k8s is an API and kubectl is just an http client. To see the k8s
+objects (everything represented by a RESTful resource) we use <code>k get &lt;resource name&gt;</code></p>
+<p>By default it will throw to the STDOUT human readable stuff, but you can also
+use <code>-o json</code> or <code>-o yaml</code> in case you want it in specific format.</p>
+<p>Also when using <code>awk</code> you may want to use <code>--no-haders</code>.</p>
+<p>You can also get multiple objects</p>
+<pre><code class="language-bash">k get pods,services
+</code></pre>
+<p>To get more info on a particular object</p>
+<pre><code class="language-bash">k describe &lt;resource name&gt; &lt;obj name&gt;
+</code></pre>
+<p>If you want to  see like a mini man page of an specific k8s object:</p>
+<pre><code class="language-bash">% k explain pods
+KIND:       Pod
+VERSION:    v1
+
+DESCRIPTION:
+    Pod is a collection of containers that can run on a host. This resource is
+    created by clients and scheduled onto hosts.
+
+FIELDS:
+  apiVersion	&lt;string&gt;
+    APIVersion defines the versioned schema of this representation of an object.
+    Servers should convert recognized schemas to the latest internal value, and
+    may reject unrecognized values. More info:
+
+</code></pre>
+<p>Sometimes you want to continually observe the state of a k8s resource, like
+when waiting for an app to restart of something you can use the <code>--watch</code> flag:</p>
+<pre><code>k get pods -n kube-system --watch
+</code></pre>
+<h2 id="creating-updating-and-destroying-k8s-objects"><a class="header" href="#creating-updating-and-destroying-k8s-objects">Creating, updating and destroying k8s objects</a></h2>
+<p>Objects in the k8s API are represented as JSON or YAML files. We can query the
+server for those, or post them with an API request.</p>
+<p>You use these JSON and YAML files to create, update or delete objects in your
+k8s server.</p>
+<p><strong>Create</strong> an object from <code>obj.yaml</code> file.</p>
+<pre><code class="language-bash">% k apply -f obj.yaml
+</code></pre>
+<p>The yaml file will have the resource type of the object.</p>
+<p>You can use the same command to <strong>update</strong> an object</p>
+<pre><code class="language-bash">% k apply -f obj.yaml
+</code></pre>
+<p>If nothing change it will not do anything, it will exit successfully, good for
+<code>for</code> loops. You can do <code>--dry-run</code> to print objects to the terminal without
+actually sending them.</p>
+<p>To do interactive edits you can use</p>
+<pre><code class="language-bash">% k edit &lt;resource-name&gt; &lt;obj-name&gt;
+# example k edit pod coredns-76f75df574-k97nj  -n kube-system
+</code></pre>
+<p>It will open the <code>yaml</code> in a text editor, wonce you save it will automatically
+be uploaded back to the k8s cluster.</p>
+<p>The <code>apply</code> command also has a history of the previous configurations
+<code>edit-last-applied</code>, <code>set-last-applied</code> and <code>view-last-applied</code> for example:</p>
+<pre><code class="language-bash">% k apply -f myobj.yaml view-last-applied
+</code></pre>
+<p>To delete you can simply run</p>
+<pre><code class="language-bash">% k delete -f myobj.yaml
+</code></pre>
+<p>You can also delete an object without the file using</p>
+<pre><code class="language-bash">% k delete &lt;resource-name&gt; &lt;obj-name&gt;
+</code></pre>
+<h2 id="labeling-and-annotating-objects"><a class="header" href="#labeling-and-annotating-objects">Labeling and Annotating Objects</a></h2>
+<p>You can update the labels and annotations using <code>label</code> and <code>annotate</code> (who
+would have thought).</p>
+<p>For example to add the <code>color=red</code> label to the pod named <code>bar</code> you can run:</p>
+<pre><code class="language-bash">k label pods bar color=red
+</code></pre>
+<p>You can not rewrite unless using <code>--overwrite</code> flag.</p>
+<p>Finally you can remove a label by doing</p>
+<pre><code class="language-bash">k labels pods bar color-
+</code></pre>
+<h2 id="debugging-commands"><a class="header" href="#debugging-commands">Debugging Commands</a></h2>
+<p>You can check logs from a pod by:</p>
+<pre><code class="language-bash">k logs &lt;pod-name&gt;
+</code></pre>
+<p>If you have multiple container in your pods you can choose which container to
+view using the <code>-c</code> flag.</p>
+<p>If you want to follow add <code>-f</code>.</p>
+<p>You can also use the <code>exec</code> command to execute a command in a running
+container.</p>
+<pre><code class="language-bash">k exec -it &lt;pod-name&gt; -- bash
+</code></pre>
+<p>If you do not have bash or a shell in your container, you can <code>attach</code> to a
+running process</p>
+<pre><code class="language-bash">k attach -it &lt;pod-name&gt;
+</code></pre>
+<p>You can also copy files to and from a container using <code>cp</code></p>
+<pre><code class="language-bash">k cp &lt;pod-name&gt;:/path/to/remote/file /path/to/local/file
+</code></pre>
+<p>This will copy a file from the container to your local machine.</p>
+<p>You can also forward traffic from your local system to the pod</p>
+<pre><code class="language-bash">k port-forward &lt;pod name&gt; 8080:80
+</code></pre>
+<p>Forwards traffic from the local machine on port 8080 to the remote container on
+port 80</p>
+<p>If you want to see the last 10 events in a namespace</p>
+<pre><code>k get events
+</code></pre>
+<p>You can also stream events <code>--watch</code></p>
+<p>Finally,  to check cluster resources being used</p>
+<pre><code>k top nodes
+</code></pre>
+<p>or</p>
+<pre><code>k top pods
+</code></pre>
+<p>These commands will only work if metrics servers are present, which they likely
+are.</p>
+<h2 id="cluster-management"><a class="header" href="#cluster-management">Cluster Management</a></h2>
+<p>Cordon and drain a particular node:</p>
+<ul>
+<li><em>cordon</em>: prevent future pods form being scheduled onto that machine</li>
+<li><em>drain</em>: remove any pods that are currently running on that machine.</li>
+</ul>
+<p>Useful for removing physical machine for repairs or upgrades. You would do <code>k cordon</code> and then <code>k drain</code> to safely remove the machine form the cluster.</p>
+<p>Once the system is back online do <code>k uncordon</code> there is no <code>undrain</code> it will
+naturally get back to normal.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-k8s-personal-notes"><a class="header" href="#-k8s-personal-notes">⛵️ k8s personal notes</a></h1>
 <ul>
 <li>First thing you need to install kubectl in your system</li>
@@ -1006,7 +1242,7 @@ describing a cluster.</p>
 want to interact with</li>
 <li>You can alias <code>echo 'alias k=kubectl' &gt;&gt;~/.bashrc</code></li>
 </ul>
-<h1 id="namespaces"><a class="header" href="#namespaces">Namespaces</a></h1>
+<h1 id="namespaces-1"><a class="header" href="#namespaces-1">Namespaces</a></h1>
 <blockquote>
 <p>The <em><strong>Namespace</strong></em> resource allows you to divide a Kubernetes cluster into
 several smaller virtual clusters.</p>
@@ -1042,21 +1278,21 @@ Server Version: v1.29.2*
 </li>
 <li>
 <p>Check cluster status</p>
-<pre><code class="language-bash">% k get componentstatuses # will be deprectated 
+<pre><code class="language-bash">% k get componentstatuses # will be deprectated
 Warning: v1 ComponentStatus is deprecated in v1.19+
 NAME                 STATUS    MESSAGE   ERROR
-controller-manager   Healthy   ok        
-scheduler            Healthy   ok        
-etcd-0               Healthy   ok  
+controller-manager   Healthy   ok
+scheduler            Healthy   ok
+etcd-0               Healthy   ok
 </code></pre>
 <p>or talk directly to the endpoint</p>
-<pre><code class="language-bash">% k get --raw='/readyz?verbose' 
+<pre><code class="language-bash">% k get --raw='/readyz?verbose'
 [+]ping ok
 [+]log ok
 [+]etcd ok
 [+]etcd-readiness ok
 [+]informer-sync ok
- # more messages 
+ # more messages
  readyz check passed
 </code></pre>
 </li>
@@ -1070,6 +1306,31 @@ node01               Ready   &lt;none&gt;          13s   v1.29.2
 <p>In k8s nodes are separated into <code>control-panel</code> nodes, like the API server,
 scheduler, etc. which manage the cluster, and <code>worker</code> nodes where your
 containers will run.</p>
+</li>
+<li>
+<p>Get more information about a specific node (prints bunch of info)</p>
+<pre><code class="language-bash">% k describe nodes kind-control-plane
+</code></pre>
+<p>more info on the ouput
+<a href="/k8s_up_and_running.html#deploying-a-k8s-cluster">here</a></p>
+</li>
+<li>
+<p>See the proxies if they are under the API object named DaemonSet</p>
+<pre><code class="language-bash">% k get daemonSets --namespace=kube-system kube-proxy
+</code></pre>
+</li>
+<li>
+<p>See DNS k8s deployment</p>
+<pre><code class="language-bash">% k get deployments --namespace=kube-system coredns
+</code></pre>
+</li>
+<li>
+<p>Wait for nodes to be ready</p>
+<pre><code class="language-bash">% k wait --for=condition=Ready nodes --all
+node/node1 condition met
+node/node2 condition met
+...
+</code></pre>
 </li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-elastic-stack-elk"><a class="header" href="#-elastic-stack-elk">📈 Elastic Stack (ELK)</a></h1>
