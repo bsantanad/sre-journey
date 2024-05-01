@@ -814,14 +814,17 @@ looking for a different job.</p>
 </li>
 </ul>
 <h2 id="establishing-a-relationship-to-toil"><a class="header" href="#establishing-a-relationship-to-toil">Establishing a Relationship to Toil</a></h2>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="-k8s"><a class="header" href="#-k8s">🚢 k8s</a></h1>
-<p>Super surprised someone still writes the full <em>Kuberenetes</em> word instead of <em>k8s</em>.
-K8s looks way cooler</p>
-<p>Go check out the chapters on this section</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="-k8s"><a class="header" href="#-k8s">⛵️ k8s</a></h1>
+<p>Super surprised someone still writes the full <em>Kuberenetes</em> word instead of
+<em>k8s</em>. K8s looks way cooler</p>
+<p>Specific k8s stuff</p>
 <ul>
 <li><a href="/k8s_up_and_running.html">🐋 k8s up and running</a></li>
-<li><a href="/k8s_personal_notes.html">⛵️ k8s personal notes</a></li>
 <li><a href="/k8s_cheatsheet.html">📝 k8s cheatsheet</a></li>
+</ul>
+<p>Things surrounding k8s</p>
+<ul>
+<li><a href="/k8s_cheatsheet.html">⎈ helm</a> (it has a really good intro on k8s)</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-k8s-up-and-running"><a class="header" href="#-k8s-up-and-running">🐋 k8s up and running</a></h1>
 <blockquote>
@@ -1552,15 +1555,232 @@ node/node2 condition met
 </li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-helm"><a class="header" href="#-helm">⎈ helm</a></h1>
-<p>Helm is the package manager for k8s.</p>
-<p>To understand the following you need to have some k8s knowledge, a small
-summary of concepts:</p>
+<p>Helm is the package manager for k8s. Let us do a super quick dive into what k8s
+is an all that just to give the context necessary to understand helm.</p>
+<h2 id="context-for-helm-containers--k8s"><a class="header" href="#context-for-helm-containers--k8s">Context for Helm (containers &amp; k8s)</a></h2>
+<p>Sometime ago someone thought of a new way of making apps, instead of them being
+a big monolithic service, we could split everything into small discrete
+standalone services. Then we could join those services using API over the
+network and build the application that way. That is how microservices were
+born.</p>
+<h3 id="containers"><a class="header" href="#containers">Containers</a></h3>
+<p>To help with this the concept of containers was introduced, it is different of
+a VM because the VM runs an entire OS on on a host machine. On the other hand,
+a container has its own file system, but it uses the same OS kernel as the
+host.</p>
+<p>A container is a program together with its dependencies and environment, they
+are packaged together into a <em>container image</em> which can be build based on a
+file where you specify the packages you want to run, and how to set the
+environments. The cool part is that all those instructions are not compiled
+into a binary or anything, but they are packaged into discrete layers.</p>
+<p>So if a host has an image with five layers, and there is another host that
+needs the same image, it will just fetch the layers it does not already have.</p>
+<p>Say you have three images using <code>fedora-minimal:37</code>, well it would reuse that
+layer on all those three.</p>
+<p>Those images are stored in a <em>registry</em>, the registry tells hosts which layers
+compose an image. So the host can only download the layers it need from the
+registry.</p>
+<p>A registry identifies an image by three things:</p>
 <ul>
-<li><em>Pods</em> are the basic execution units for containers.</li>
-<li><em>ConfigMaps</em> store configuration data for Pods.</li>
-<li><em>Deployments</em> automate the rollout of new versions of an application.</li>
-<li><em>Services</em> provide network abstraction and load balancing for accessing Pods.</li>
+<li>name: basically a string <code>fedora</code> or <code>fedora-minimal</code></li>
+<li>tag: usually the version <code>latest</code> or <code>v1</code></li>
+<li>digest: a hash of the image, since the tags are mutable.</li>
 </ul>
+<p>They look like <code>name:tag@digest</code>.</p>
+<h3 id="kubernetes-or-k8s-like-the-cool-kids-call-it"><a class="header" href="#kubernetes-or-k8s-like-the-cool-kids-call-it">Kubernetes (or k8s like the cool kids call it)</a></h3>
+<p>So with all these container stuff, some questions begin to arise:</p>
+<ul>
+<li>How do we best execute lots of containers?</li>
+<li>How can they work together?</li>
+<li>How do we manage memory, cpu, network and storage?</li>
+</ul>
+<p>Well a bunch of companies tried to create this orchestration of containers
+technology to answer those questions, at the end as per 2024 seems like Google
+won, and we now all use ⛵️ K8s.(which is greek for ship's capitan or something
+like that)</p>
+<p>K8s won because it introduced two concepts that people really liked.</p>
+<ul>
+<li>
+<p><strong>Declarative infrastructure</strong>
+Basically you tell k8s what your desired state of the cluster is, and it
+will work to make that happen.</p>
+</li>
+<li>
+<p><strong>Reconciliation loop</strong>
+How does k8s work behinds the scenes to reach the declarative configuration
+we set? Using a reconciliation loop.</p>
+<p>In a reconciliation loop, the scheduler says: "Here is what the user wrote
+as his/her desired state. Here is the current state. They are not the same,
+lets reconcile them."</p>
+<p>Say you specified storage, and the scheduler sees that we do not have
+storage yet, it will create units of storage and attach them to your
+containers.</p>
+</li>
+</ul>
+<h3 id="pods-1"><a class="header" href="#pods-1">Pods</a></h3>
+<p>We do not deal directly with containers when setting up our k8s cluster.
+We use a pods. A pod which is basically a group of containers. These are
+defined in a manifest (<code>yaml</code> or <code>json</code>, but most people use <code>yaml</code>)</p>
+<pre><code class="language-yaml">apiVersion: v1 # we can see that this will be a v1 Pod
+kind: Pod
+metadata:
+    name: example-pod
+spec:
+    containers:
+    - image: "fedora-minimal:latest"
+    - name: example-fedora
+</code></pre>
+<p>A Pod can have 1 or more containers. The containers that help preconfigurate
+stuff for the main one, are called <em>init containers</em>.</p>
+<p>The ones that run alongside the main container are called <em>sidecar containers</em></p>
+<h3 id="configmaps"><a class="header" href="#configmaps"><code>ConfigMaps</code></a></h3>
+<p>Basically in a pod you describe the configuration the containers need, like
+network ports files system mount points. You can store configuration
+information for k8s in <code>ConfigMaps</code> and password and stuff like that in
+<code>Secret</code>.</p>
+<p>Here is an example:</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: configuration-data
+data: # inside here we will declare aribitrary key/value stuff
+    backgroundColor: blue
+    title: Learning Helm
+</code></pre>
+<p>For <code>Secret</code> is pretty much the same as for <code>ConfigMaps</code> but the values in data
+must be Base64 encoded.</p>
+<p>Pods then can be linked to the ConfigMaps like this:</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+    name: example-pod
+spec:
+    volumes:
+    # note that this is not the metadata name you used in the ConfigMap
+    - name: my-configuration
+      configMap:
+        name: configuration-data # same name as in metadata of ConfigMap
+    containers:
+    - image: "fedora-minimal:latest"
+      name: example-fedora
+      env:
+        - name: TITLE # the env variable will be title
+          valueFrom:
+            configMapKeyRef:
+                name: configuration-data # name for the volume
+                key: title # key in the actual ConfigMap
+</code></pre>
+<h3 id="deployments"><a class="header" href="#deployments">Deployments</a></h3>
+<p>Pretty cool stuff, but we might not just one to run one instance of our
+container, therefore we can use something called <code>Deployments</code>.</p>
+<p>A <code>Deployment</code> describe an application as a collection of identical pods,we can
+tell k8s to create our app with a single pod and scale it up to five pods.</p>
+<pre><code class="language-yaml">apiVersion: apps/v1 # apps/v1 Deployment
+kind: Deployment
+metadata:
+    name: example-deployment
+    labels:
+        app: my-deployment
+spec:
+    replicas: 3 # we want three replicas of the following template
+    selector:
+        matchLabels:
+            app: my-deployment
+    template:
+        metadata:
+            labels:
+                app: my-deployment
+        spec:
+           containers :
+            -image: "fedora-minimal"
+             name: "example-fedora"
+</code></pre>
+<h3 id="service"><a class="header" href="#service">Service</a></h3>
+<p>A <code>Service</code> is a persistent network resource, that persists even if the pod or
+pods attached to it go away.</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Service
+metadata:
+    name: example-service
+spec:
+    selector:
+      app: my-deployment
+    ports:
+      -  protocol: TCP
+         port: 80
+         targetPort: 8080
+</code></pre>
+<p>Here we define a service for the pods with the <code>app: my-deployment</code>, telling
+that traffic port 80 of this <code>Service</code> will be routed to 8080.</p>
+<h2 id="helms-goal"><a class="header" href="#helms-goal">Helm's Goal</a></h2>
+<p>So we have seen the building block of K8s, say you want to deploy a WordPress
+app, you would need a <code>Deployment</code> for the containers, then a <code>ConfigMap</code> and
+<code>Secret</code> for the password, maybe some <code>Service</code> objects and so on. That sounds
+like a lot of <code>yaml</code>.</p>
+<p>The core idea of Helm  is that all those objects can be packaged to be
+<code>installed</code>, <code>updated</code> and <code>deleted</code> together.</p>
+<p>Basically helm is the package manger of kuberentes.  Helm will allow you to
+spin up all the k8s objects necessary for an app by just using a few commands.</p>
+<p>Here are some of the things that helm can do:</p>
+<ul>
+<li>Provide package repos (similar to <code>dnf</code> or <code>apt</code>).</li>
+<li>Familiar install, upgrade, delete commands.</li>
+<li>Helm has a method for configuring the packages before installing them.</li>
+<li>Helm can also let you know what already is installed.</li>
+</ul>
+<p>You can also limit the installation of packages to a specific namespace, so you
+can install the same package in different namespaces in the same k8s cluster.
+(<a href="/k8s_up_and_running.html#namespaces">What is a namespace?</a>)</p>
+<p>Helm also provides <strong>reusability</strong>, it uses charts for this. A chart provides a
+pattern for producing the same k8s manifests. But the cool part is that you can
+also add more configuration to those charts.</p>
+<p>Helm provides patterns for storing the initial configuration plus the changes
+you did. Helm encourages k8s users to package their <code>yaml</code> into charts so that
+these descriptors can be reused.</p>
+<p>One last thing, keep in mind that helm is not a configuration tool, it helps
+but it there are software specialized on that like ansible, puppet or chef.</p>
+<h2 id="helm-architecture"><a class="header" href="#helm-architecture">Helm Architecture</a></h2>
+<p>Here are the main components that helm uses.</p>
+<h3 id="k8s-resourceobject"><a class="header" href="#k8s-resourceobject">K8s Resource/Object</a></h3>
+<p>These are the <code>Pods</code>, <code>ConfigMap</code>, <code>Deployment</code>, we have seen throughout the
+chapter. K8s has a lot of these objects, you can even define custom ones using
+custom resource definition (CRD).</p>
+<p>All the resources share some elements</p>
+<pre><code class="language-yaml">apiVersion: apps/v1 # api and version of the resource
+kind: Deployment # resource type
+metadata: # top-level data on the resource/object
+    name: example-deployment # req for all objects
+    labels: # used for creating query-able handles
+        some-name: some-value
+    annotations: # authors to attach their own keys and values
+        some-name: some-value
+</code></pre>
+<h3 id="charts"><a class="header" href="#charts">Charts</a></h3>
+<p>A package is called a chart. The idea es that k8s meaning captian, helm being
+the steering mechanism of the ship. The chart plots the way k8s apps should be
+installed.</p>
+<p>A Chart is a set of files and directories that describe how to install the
+different k8s resource/objects</p>
+<p>A chart contains</p>
+<ul>
+<li><code>Chart.yaml</code>: describes the chart (name, description, authors)</li>
+<li><code>templates</code> directory: Inside all the k8s manifests  potentially annotated
+with templating directives</li>
+<li><code>values.yaml</code>  file that provides the default configuration. You can override
+during installation.</li>
+</ul>
+<p>These are the basic stuff for an unpacked chart, a packed chart is just a tar
+ball with all this inside.</p>
+<h3 id="resources-installations-and-releases"><a class="header" href="#resources-installations-and-releases">Resources, Installations and Releases</a></h3>
+<p>When a helm chart is installed:</p>
+<ol>
+<li>helm reads the charts (will download if necessary)</li>
+<li>It sends the values into the templates generating the k8s manifests</li>
+<li>The manifests are sent to k8s</li>
+<li>K8s creates the requested resources inside the cluster</li>
+</ol>
+<p>One last concept <em>release</em>. A release is created each time we use helm to
+modify the installation</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-elastic-stack-elk"><a class="header" href="#-elastic-stack-elk">📈 Elastic Stack (ELK)</a></h1>
 <h1 id="table-of-contents-2"><a class="header" href="#table-of-contents-2">Table of contents</a></h1>
 <ul>
