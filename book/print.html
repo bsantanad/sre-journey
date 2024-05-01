@@ -89,7 +89,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> 🛶 Introduction</a></li><li class="chapter-item expanded "><a href="becoming_sre.html"><strong aria-hidden="true">2.</strong> 📚 Becoming SRE</a></li><li class="chapter-item expanded "><a href="k8s.html"><strong aria-hidden="true">3.</strong> 🚢 k8s</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running.html"><strong aria-hidden="true">3.1.</strong> 🐋 k8s up and running</a></li><li class="chapter-item expanded "><a href="k8s_personal_notes.html"><strong aria-hidden="true">3.2.</strong> ⛵️ k8s personal notes</a></li><li class="chapter-item expanded "><a href="k8s_cheatsheet.html"><strong aria-hidden="true">3.3.</strong> 📝 k8s cheatsheet</a></li></ol></li><li class="chapter-item expanded "><a href="elk_stack.html"><strong aria-hidden="true">4.</strong> 📈 ELK Stack</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> 🛶 Introduction</a></li><li class="chapter-item expanded "><a href="becoming_sre.html"><strong aria-hidden="true">2.</strong> 📚 Becoming SRE</a></li><li class="chapter-item expanded "><a href="k8s.html"><strong aria-hidden="true">3.</strong> ⛵️ k8s</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running.html"><strong aria-hidden="true">3.1.</strong> 🐋 k8s up and running</a></li><li class="chapter-item expanded "><a href="k8s_cheatsheet.html"><strong aria-hidden="true">3.2.</strong> 📝 k8s cheatsheet</a></li><li class="chapter-item expanded "><a href="helm.html"><strong aria-hidden="true">3.3.</strong> ⎈ helm</a></li></ol></li><li class="chapter-item expanded "><a href="elk_stack.html"><strong aria-hidden="true">4.</strong> 📈 ELK Stack</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -864,6 +864,20 @@ Burns, Joe Beda, and Kelsey Hightower O'Reilly</em></a>.
 <li><a href="k8s_up_and_running.html#cluster-management">Cluster Management</a></li>
 </ul>
 </li>
+<li><a href="k8s_up_and_running.html#pods">Pods</a>
+<ul>
+<li><a href="k8s_up_and_running.html#thinking-in-pods">Thinking in Pods</a></li>
+<li><a href="k8s_up_and_running.html#the-pod-manifest">The Pod Manifest</a>
+<ul>
+<li><a href="k8s_up_and_running.html#creating-a-manifest">Creating a manifest</a></li>
+</ul>
+</li>
+<li><a href="k8s_up_and_running.html#some-useful-commands">Some Useful Commands</a></li>
+<li><a href="k8s_up_and_running.html#health-checks">Health Checks</a></li>
+<li><a href="k8s_up_and_running.html#resource-management">Resource Management</a></li>
+<li><a href="k8s_up_and_running.html#persisting-data-with-volumes">Persisting Data with Volumes</a></li>
+</ul>
+</li>
 </ul>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
 <aside>
@@ -1235,26 +1249,230 @@ are.</p>
 <p>Useful for removing physical machine for repairs or upgrades. You would do <code>k cordon</code> and then <code>k drain</code> to safely remove the machine form the cluster.</p>
 <p>Once the system is back online do <code>k uncordon</code> there is no <code>undrain</code> it will
 naturally get back to normal.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="-k8s-personal-notes"><a class="header" href="#-k8s-personal-notes">⛵️ k8s personal notes</a></h1>
-<ul>
-<li>First thing you need to install kubectl in your system</li>
-<li>Then you need to have a <code>~/.kube/config</code> file, pointing to the cluster you
-want to interact with</li>
-<li>You can alias <code>echo 'alias k=kubectl' &gt;&gt;~/.bashrc</code></li>
-</ul>
-<h1 id="namespaces-1"><a class="header" href="#namespaces-1">Namespaces</a></h1>
-<blockquote>
-<p>The <em><strong>Namespace</strong></em> resource allows you to divide a Kubernetes cluster into
-several smaller virtual clusters.</p>
-</blockquote>
-<pre><code class="language-bash">k get ns
-</code></pre>
 <h1 id="pods"><a class="header" href="#pods">Pods</a></h1>
-<blockquote>
-<p>Pods are the smallest building blocks in Kubernetes …. A Pod is made up
-of one or more containers that share network and storage resource</p>
-</blockquote>
-<pre><code class="language-bash">k get pod -n &lt;some namespace&gt;
+<p>K8s groups multiple containers into a single atomic unit called a <em>pod</em> (This
+also goes with the docker theme, since a group of whales is a pod lol)</p>
+<p>A pod is a collection of app containers and volumes running in the same
+environment. Containers in a pod always land in the same machine.</p>
+<p>Apps running in the same pod share, ip addresses and port, hostname, and can
+communicate to each other using interprocess communication channels. Meaning
+they share:</p>
+<ul>
+<li>network namespace</li>
+<li>UTS namespace</li>
+<li>IPC namespace</li>
+</ul>
+<h2 id="thinking-in-pods"><a class="header" href="#thinking-in-pods">Thinking in Pods</a></h2>
+<p><em>What should go in a Pod?</em> To answer this question you go look at your
+different containers and ask <em>"Will these containers work correctly if they
+land on different machines?"</em> If no, then a pod is the correct way of grouping
+them. If yes, you can use multiple pods.</p>
+<p>An example, say you want to deploy a wordpress app with a mysql database. Would
+you put them in the same pod? I already read the book so I know the answer is
+no, but why?</p>
+<p>The answer is no because both of those services do not need to scale together.
+The wordpress app itself is stateless, so you can create more wordpress pods if
+you are scaling. On the other hand a mysql database is much different to scale,
+it can be trickier, and you are likely to increase the resources dedicated to a
+single mysql pod.</p>
+<h2 id="the-pod-manifest"><a class="header" href="#the-pod-manifest">The Pod Manifest</a></h2>
+<p>Pods are describe in a <em>manifest</em> which is a text-file representation of the
+k8s API object.</p>
+<p>As you might remember from the fist chapter, k8s uses a <em>declarative
+configuration</em>, which basically means that you tell k8s your ideal state of the
+world and it will take action to ensure the state becomes a reality.</p>
+<p>When you send a manifest to k8s, it will accept it and process it before
+storing it in persistent storage <code>(etcd)</code>. The <em>scheduler</em> will find pods that
+have not been assigned to a node, and will place the pods onto those nodes
+depending on the resources and constrains you specified in your manifest. K8s
+will try to ensure pods from the same app are in different machines for
+reliability.</p>
+<p>You can see the pods with</p>
+<pre><code class="language-bash">k get pods
+</code></pre>
+<p>You can delete a pod with</p>
+<pre><code class="language-bash">k delete pods/&lt;name&gt;
+</code></pre>
+<h3 id="creating-a-manifest"><a class="header" href="#creating-a-manifest">Creating a manifest</a></h3>
+<p>Pod manifest should be treated in the same way a source code, adding comments
+to help explain the pod to new team members and stuff like that.</p>
+<p>The manifests include a couple of key fields and attributes,</p>
+<ul>
+<li><code>metadata</code>:
+<ul>
+<li><code>name</code>: a unique identifier for the deployment</li>
+<li><code>namespace</code>: the Kubernetes namespace where the deployment will live</li>
+<li><code>labels</code>: key-value pairs that can be used to filter and categorize objects</li>
+</ul>
+</li>
+<li><code>spec</code>:
+<ul>
+<li><code>containers</code>:
+<ul>
+<li><code>name</code>: a unique identifier for the container</li>
+<li><code>image</code>: the Docker image to use for this container</li>
+<li><code>command</code>: the default command to run in the container</li>
+<li><code>args</code>: any additional arguments to pass to the command</li>
+<li><code>volumeMounts</code>: mounts for persistent storage or other files</li>
+</ul>
+</li>
+<li>volumes:
+<ul>
+<li><code>name</code>: a unique identifier for the volume</li>
+<li><code>persistentVolumeClaim</code>: claims a Persistent Volume resource</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>selectors</code>: used to filter which pods are included in this deployment</li>
+</ul>
+<p>Example</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2024-04-29T20:02:16Z"
+  generateName: coredns-76f75df574-
+  labels:
+    k8s-app: kube-dns
+    pod-template-hash: 76f75df574
+  name: coredns-76f75df574-k97nj
+  namespace: kube-system
+  # more stuff
+  uid: 4dd80223-de4c-49d7-b407-31908ae96b9e
+spec:
+  # more stuff
+  containers:
+  - args:
+    - -conf
+    - /etc/coredns/Corefile
+    image: registry.k8s.io/coredns/coredns:v1.11.1
+    imagePullPolicy: IfNotPresent
+    # more stuff
+
+    volumeMounts:
+    - mountPath: /etc/coredns
+      name: config-volume
+      readOnly: true
+    # more stuff
+
+  volumes:
+  - configMap:
+      defaultMode: 420
+      items:
+      - key: Corefile
+        path: Corefile
+      name: coredns
+      # more stuff
+
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2024-04-29T20:02:19Z"
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+  # more stuff
+</code></pre>
+<p>You can create a pod from them by using <code>k apply -f manifest.yaml</code> as seen in
+previous sections.</p>
+<h2 id="some-useful-commands"><a class="header" href="#some-useful-commands">Some Useful Commands</a></h2>
+<pre><code class="language-bash"># get info
+k get pods  # list pods
+k describe pods &lt;podname&gt; # more info on the k8s object
+
+# manipulate pods
+k delete pods/&lt;podname&gt; # delete pod, all info associated to it will be deleted
+k logs &lt;podname&gt; # check logs
+k exec &lt;podname&gt; -- date # run date command inside pod
+k exec -it &lt;podname&gt; -- bash # interactive tty
+k cp # keep in mind that copying files into a container is an antipattern.
+</code></pre>
+<h2 id="health-checks"><a class="header" href="#health-checks">Health Checks</a></h2>
+<p>When you are running an app in k8s, it is automatically kept alive by a process
+health check. This ensure that the app is always running, if it is not it k8s
+will restart it.</p>
+<p>Sometimes, checking if the process is alive is not enough, maybe it was left
+hanging or something like that. K8s has something to check application
+<em>liveness</em> and other stuff for your app.</p>
+<p>There are different kinds of probes here are some:</p>
+<ul>
+<li>
+<p><strong>Liveness Probe</strong>
+This will check app specific stuff, for example checking if http is
+returning 200.</p>
+<p>While the default response to a failed liveness is to restart you can
+change what happened with <code>restartPolicy</code></p>
+<p>Here is an example of a <code>livenessProbe</code></p>
+<pre><code>spec:
+  containers:
+  - name: my-container
+    image: my-image:latest
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 80
+        scheme: HTTP
+        initialDelaySeconds: 30
+        timeoutSeconds: 5
+</code></pre>
+</li>
+<li>
+<p><strong>Readiness Probe</strong>
+These probes check if an app is ready to serve user requests. Apps that
+fail are removed from the load balancers</p>
+</li>
+<li>
+<p><strong>Startup Probe</strong>
+Enables you to poll slowly from a slow-starting container, while also
+enabling  responsive liveness checks once the container has initialized</p>
+</li>
+</ul>
+<h2 id="resource-management"><a class="header" href="#resource-management">Resource Management</a></h2>
+<p>K8s allow you to increase the overall utilization of the machines that are in
+the cluster.</p>
+<p>Utilization is defined as the amount of resource actively being used divided by
+the amount of a resource that has been purchased</p>
+<p>Example, if you purchase a one-core machine, and your app uses one tenth of a
+core, then your utilization is 10%</p>
+<p>You can tell k8s the upper limit and lower limit of resources you want for an
+specific container. Keep in mind that this is on a per-container basis, the
+whole pod will the sum of the containers.</p>
+<p>You can do this by setting up <code>resources</code> in the manifest. The lower limit is
+<code>requests</code> and the upper limit is <code>limits</code>.</p>
+<pre><code class="language-yaml">spec:
+    containers:
+    - image: blabla:latest
+      name: jose
+      resouces:
+        cpu: "500m"
+        memory: "128Mi"
+      limit:
+        cpu: "1000m"
+        memory: "256Mi"
+    # more stuff
+</code></pre>
+<h2 id="persisting-data-with-volumes"><a class="header" href="#persisting-data-with-volumes">Persisting Data with Volumes</a></h2>
+<p>When a container restarts, any data in it will also be deleted. Which is good
+since we do not want to leave around cruft.</p>
+<p>We can still add volumes to our pods though, that will persist this deletion</p>
+<p>In order to do this, you need to two things to the manifest <code>spec.volumes</code>,
+which is an array of all volumes that the pod will need.</p>
+<p>And the other is <code>volumeMount</code> which specify inside the container definition
+the file system to use.</p>
+<p>So basically one is like, what volumes will the whole pod use, and the other is
+specific to each container.</p>
+<pre><code class="language-yaml">spec:
+  containers:
+  - name: my-container
+    image: busybox:latest
+    volumeMounts:
+    - name: my-filesystem
+      mountPath: /mnt
+      subPath: data
+  volumes:
+  - name: my-filesystem
+    persistentVolumeClaim:
+      claimName: my-pvc
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-k8s-cheatsheet"><a class="header" href="#-k8s-cheatsheet">📝 k8s cheatsheet</a></h1>
 <p>Some useful commands</p>
@@ -1332,6 +1550,16 @@ node/node2 condition met
 ...
 </code></pre>
 </li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="-helm"><a class="header" href="#-helm">⎈ helm</a></h1>
+<p>Helm is the package manager for k8s.</p>
+<p>To understand the following you need to have some k8s knowledge, a small
+summary of concepts:</p>
+<ul>
+<li><em>Pods</em> are the basic execution units for containers.</li>
+<li><em>ConfigMaps</em> store configuration data for Pods.</li>
+<li><em>Deployments</em> automate the rollout of new versions of an application.</li>
+<li><em>Services</em> provide network abstraction and load balancing for accessing Pods.</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-elastic-stack-elk"><a class="header" href="#-elastic-stack-elk">📈 Elastic Stack (ELK)</a></h1>
 <h1 id="table-of-contents-2"><a class="header" href="#table-of-contents-2">Table of contents</a></h1>
