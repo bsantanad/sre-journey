@@ -1,5 +1,14 @@
 # ⎈ helm
 
+> ⚠️ These are notes taken from the book [_Learning Helm by Matt Butcher, Matt
+> Farina and Josh Dolitsky on
+> O'Reilly_](https://learning.oreilly.com/library/view/learning-helm/9781492083641/ch02.html#idm46126000033640)
+> **Please go read it and just use this as reference**.
+<!-- toc -->
+
+
+# Introduction
+
 Helm is the package manager for k8s. Let us do a super quick dive into what k8s
 is an all that just to give the context necessary to understand helm.
 
@@ -278,3 +287,199 @@ When a helm chart is installed:
 
 One last concept _release_. A release is created each time we use helm to
 modify the installation
+
+
+# Using Helm
+
+Helm is a cli, you can install it with your favorite package manger or  build
+it from source it is written in golang.
+
+You can check the version by
+```
+helm version
+```
+
+Helm will use the same KUBECONFIG file you have configured for `kubectl`, it
+will look in the same places, though you can specify a path for one.
+
+The most common workflow is:
+1. Add a chart repo
+2. Find a chart to install
+3. Install a Helm  chart
+4. See the list of what is installed
+5. Upgrade your installation
+6. Delete your installation
+
+## Adding a Chart Repo
+
+A Helm Chart is an individual package that can be installed into your k8s
+cluster. You can find then  at chart repositories.
+
+You can find popular repositories in [the artifact hub](https://artifacthub.io)
+
+By default `helm` does not have any repo added, so you need to look for one
+there.
+
+Bitnamis's official Helm charts are one of the best well-curated charts repos.
+(Some Bitnami devs are among the core contributors who design the helm repo
+system)
+
+To add a repo you do `helm repo add` so:
+```bash
+% helm repo add bitnami https://charts.bitnami.com/bitnami
+"bitnami" has been added to your repositories
+```
+
+Now if you do
+```bash
+% helm repo list
+NAME    URL
+bitnami https://charts.bitnami.com/bitnami
+```
+
+You will see it there. After that we can look for specific charts.
+
+```bash
+% helm search repo drupal
+NAME            CHART VERSION   APP VERSION     DESCRIPTION
+bitnami/drupal  18.0.2          10.2.5          Drupal is one of the most versatile open source...
+```
+
+You can also search label and descriptions
+```bash
+% helm search repo content
+NAME                    CHART VERSION   APP VERSION     DESCRIPTION
+bitnami/drupal          18.0.2          10.2.5          Drupal is one of the most versatile open source...
+bitnami/harbor          21.1.2          2.10.2          Harbor is an open source trusted cloud-native r...
+bitnami/nginx           16.0.6          1.25.5          NGINX Open Source is a web server that can be a...
+bitnami/owncloud        12.2.11         10.11.0         DEPRECATED ownCloud is an open source content c...
+bitnami/wordpress       22.2.2          6.5.2           WordPress is the world's most popular blogging ...
+```
+
+The chart version is the version of well, the chart. On the other hand the app
+version is the version of the software it would install.
+
+## Installing a package
+
+
+```bash
+% helm install mysite bitnami/drupal
+NAME: mysite
+LAST DEPLOYED: Wed May  1 16:40:16 2024
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+# more text
+```
+
+Typical stuff, just a few things to keep in mind.
+
+- Difference between an installation and a chart.
+
+    An installation of a chart is a specific instance of the chart
+    One chart may have many installations
+
+- You can repeat instance names (`mysite`), but it must be on different
+  namespaces.
+
+
+You can set values specific to your installation, you can set them directly
+from the command line with `--set`  for example. (this works with both set
+`install` and `upgrade`)
+
+```bash
+% helm install mysite bitnami/drupal --set drupalUsername=admin
+```
+
+You can also have them in a `yaml` file, which is the recommended approach.
+
+```bash
+% helm upgrade mysite bitnami/drupal --values values.yaml
+```
+For example `values.yaml` would look like this:
+```yaml
+drupalUsername: admin
+drupalEmail: admin@example.com
+mariadb:
+    db:
+        name: "my-database"
+```
+
+## Listing your Installations
+
+```bash
+% helm list
+NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
+mysite  default         1               2024-05-01 16:40:16.50636 -0600 CST     deployed        drupal-18.0.2   10.2.5
+```
+
+Not much to say here, does what expected.
+
+## Upgrading an Installation
+
+So there are two types of changes:
+- upgrade version of the chart
+- upgrade configuration of the chart
+
+Every time we perform an upgrade we are doing a new release of the same
+installation.
+
+Helm will attempt to to alter only the bare minimum, so if you only changes one
+simple configuration variable, it will not like restart everything and all
+that.
+
+To restart stuff just use `kubectl`.
+
+To update your chart with a new version you can
+```bash
+% helm repo update
+% helm upgrade mysite bitnami/drupal
+```
+
+## Configuration Values
+
+If you do this:
+```bash
+% helm install mysite bitnami/drupal --values values.yaml
+% helm upgrade mysite bitnami/drupal
+```
+Chances are you lost your values, so it is good to always send the `yaml`
+
+```bash
+% helm install mysite bitnami/drupal --values values.yaml
+% helm upgrade mysite bitnami/drupal --values values.yaml
+```
+
+You can use `helm get values mysite` to see the values sent on the last install
+or upgrade.
+
+You could also use:
+```bash
+% helm upgrade mysite bitnami/drupal --reuse-values
+```
+But it is not recommended
+
+## Uninstalling charts
+
+Not much to say here
+```bash
+% helm uninstall mysite
+```
+Works as you would expect, if you would do
+```
+% helm list
+```
+You will not see it there.
+
+Lastly, you can see a special record that contain release information.
+```bash
+% k get secret
+```
+Helm stores there the info.
+
+If you uninstall you loose the history, so be careful. You could `helm
+uninstall --keep-history`. Good if you plan on doing `helm rollback`.
+
+That is pretty much the basics on helm.
