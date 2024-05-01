@@ -1555,6 +1555,47 @@ node/node2 condition met
 </li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-helm"><a class="header" href="#-helm">⎈ helm</a></h1>
+<blockquote>
+<p>⚠️ These are notes taken from the book <a href="https://learning.oreilly.com/library/view/learning-helm/9781492083641/ch02.html#idm46126000033640"><em>Learning Helm by Matt Butcher, Matt
+Farina and Josh Dolitsky on
+O'Reilly</em></a>
+<strong>Please go read it and just use this as reference</strong>.</p>
+</blockquote>
+<ul>
+<li><a href="helm.html#introduction">Introduction</a>
+<ul>
+<li><a href="helm.html#context-for-helm-containers--k8s">Context for Helm (containers &amp; k8s)</a>
+<ul>
+<li><a href="helm.html#containers">Containers</a></li>
+<li><a href="helm.html#kubernetes-or-k8s-like-the-cool-kids-call-it">Kubernetes (or k8s like the cool kids call it)</a></li>
+<li><a href="helm.html#pods">Pods</a></li>
+<li><a href="helm.html#configmaps"><code>ConfigMaps</code></a></li>
+<li><a href="helm.html#deployments">Deployments</a></li>
+<li><a href="helm.html#service">Service</a></li>
+</ul>
+</li>
+<li><a href="helm.html#helms-goal">Helm's Goal</a></li>
+<li><a href="helm.html#helm-architecture">Helm Architecture</a>
+<ul>
+<li><a href="helm.html#k8s-resourceobject">K8s Resource/Object</a></li>
+<li><a href="helm.html#charts">Charts</a></li>
+<li><a href="helm.html#resources-installations-and-releases">Resources, Installations and Releases</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="helm.html#using-helm">Using Helm</a>
+<ul>
+<li><a href="helm.html#adding-a-chart-repo">Adding a Chart Repo</a></li>
+<li><a href="helm.html#installing-a-package">Installing a package</a></li>
+<li><a href="helm.html#listing-your-installations">Listing your Installations</a></li>
+<li><a href="helm.html#upgrading-an-installation">Upgrading an Installation</a></li>
+<li><a href="helm.html#configuration-values">Configuration Values</a></li>
+<li><a href="helm.html#uninstalling-charts">Uninstalling charts</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="introduction-1"><a class="header" href="#introduction-1">Introduction</a></h1>
 <p>Helm is the package manager for k8s. Let us do a super quick dive into what k8s
 is an all that just to give the context necessary to understand helm.</p>
 <h2 id="context-for-helm-containers--k8s"><a class="header" href="#context-for-helm-containers--k8s">Context for Helm (containers &amp; k8s)</a></h2>
@@ -1781,6 +1822,146 @@ ball with all this inside.</p>
 </ol>
 <p>One last concept <em>release</em>. A release is created each time we use helm to
 modify the installation</p>
+<h1 id="using-helm"><a class="header" href="#using-helm">Using Helm</a></h1>
+<p>Helm is a cli, you can install it with your favorite package manger or  build
+it from source it is written in golang.</p>
+<p>You can check the version by</p>
+<pre><code>helm version
+</code></pre>
+<p>Helm will use the same KUBECONFIG file you have configured for <code>kubectl</code>, it
+will look in the same places, though you can specify a path for one.</p>
+<p>The most common workflow is:</p>
+<ol>
+<li>Add a chart repo</li>
+<li>Find a chart to install</li>
+<li>Install a Helm  chart</li>
+<li>See the list of what is installed</li>
+<li>Upgrade your installation</li>
+<li>Delete your installation</li>
+</ol>
+<h2 id="adding-a-chart-repo"><a class="header" href="#adding-a-chart-repo">Adding a Chart Repo</a></h2>
+<p>A Helm Chart is an individual package that can be installed into your k8s
+cluster. You can find then  at chart repositories.</p>
+<p>You can find popular repositories in <a href="https://artifacthub.io">the artifact hub</a></p>
+<p>By default <code>helm</code> does not have any repo added, so you need to look for one
+there.</p>
+<p>Bitnamis's official Helm charts are one of the best well-curated charts repos.
+(Some Bitnami devs are among the core contributors who design the helm repo
+system)</p>
+<p>To add a repo you do <code>helm repo add</code> so:</p>
+<pre><code class="language-bash">% helm repo add bitnami https://charts.bitnami.com/bitnami
+"bitnami" has been added to your repositories
+</code></pre>
+<p>Now if you do</p>
+<pre><code class="language-bash">% helm repo list
+NAME    URL
+bitnami https://charts.bitnami.com/bitnami
+</code></pre>
+<p>You will see it there. After that we can look for specific charts.</p>
+<pre><code class="language-bash">% helm search repo drupal
+NAME            CHART VERSION   APP VERSION     DESCRIPTION
+bitnami/drupal  18.0.2          10.2.5          Drupal is one of the most versatile open source...
+</code></pre>
+<p>You can also search label and descriptions</p>
+<pre><code class="language-bash">% helm search repo content
+NAME                    CHART VERSION   APP VERSION     DESCRIPTION
+bitnami/drupal          18.0.2          10.2.5          Drupal is one of the most versatile open source...
+bitnami/harbor          21.1.2          2.10.2          Harbor is an open source trusted cloud-native r...
+bitnami/nginx           16.0.6          1.25.5          NGINX Open Source is a web server that can be a...
+bitnami/owncloud        12.2.11         10.11.0         DEPRECATED ownCloud is an open source content c...
+bitnami/wordpress       22.2.2          6.5.2           WordPress is the world's most popular blogging ...
+</code></pre>
+<p>The chart version is the version of well, the chart. On the other hand the app
+version is the version of the software it would install.</p>
+<h2 id="installing-a-package"><a class="header" href="#installing-a-package">Installing a package</a></h2>
+<pre><code class="language-bash">% helm install mysite bitnami/drupal
+NAME: mysite
+LAST DEPLOYED: Wed May  1 16:40:16 2024
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+# more text
+</code></pre>
+<p>Typical stuff, just a few things to keep in mind.</p>
+<ul>
+<li>
+<p>Difference between an installation and a chart.</p>
+<p>An installation of a chart is a specific instance of the chart
+One chart may have many installations</p>
+</li>
+<li>
+<p>You can repeat instance names (<code>mysite</code>), but it must be on different
+namespaces.</p>
+</li>
+</ul>
+<p>You can set values specific to your installation, you can set them directly
+from the command line with <code>--set</code>  for example. (this works with both set
+<code>install</code> and <code>upgrade</code>)</p>
+<pre><code class="language-bash">% helm install mysite bitnami/drupal --set drupalUsername=admin
+</code></pre>
+<p>You can also have them in a <code>yaml</code> file, which is the recommended approach.</p>
+<pre><code class="language-bash">% helm upgrade mysite bitnami/drupal --values values.yaml
+</code></pre>
+<p>For example <code>values.yaml</code> would look like this:</p>
+<pre><code class="language-yaml">drupalUsername: admin
+drupalEmail: admin@example.com
+mariadb:
+    db:
+        name: "my-database"
+</code></pre>
+<h2 id="listing-your-installations"><a class="header" href="#listing-your-installations">Listing your Installations</a></h2>
+<pre><code class="language-bash">% helm list
+NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
+mysite  default         1               2024-05-01 16:40:16.50636 -0600 CST     deployed        drupal-18.0.2   10.2.5
+</code></pre>
+<p>Not much to say here, does what expected.</p>
+<h2 id="upgrading-an-installation"><a class="header" href="#upgrading-an-installation">Upgrading an Installation</a></h2>
+<p>So there are two types of changes:</p>
+<ul>
+<li>upgrade version of the chart</li>
+<li>upgrade configuration of the chart</li>
+</ul>
+<p>Every time we perform an upgrade we are doing a new release of the same
+installation.</p>
+<p>Helm will attempt to to alter only the bare minimum, so if you only changes one
+simple configuration variable, it will not like restart everything and all
+that.</p>
+<p>To restart stuff just use <code>kubectl</code>.</p>
+<p>To update your chart with a new version you can</p>
+<pre><code class="language-bash">% helm repo update
+% helm upgrade mysite bitnami/drupal
+</code></pre>
+<h2 id="configuration-values"><a class="header" href="#configuration-values">Configuration Values</a></h2>
+<p>If you do this:</p>
+<pre><code class="language-bash">% helm install mysite bitnami/drupal --values values.yaml
+% helm upgrade mysite bitnami/drupal
+</code></pre>
+<p>Chances are you lost your values, so it is good to always send the <code>yaml</code></p>
+<pre><code class="language-bash">% helm install mysite bitnami/drupal --values values.yaml
+% helm upgrade mysite bitnami/drupal --values values.yaml
+</code></pre>
+<p>You can use <code>helm get values mysite</code> to see the values sent on the last install
+or upgrade.</p>
+<p>You could also use:</p>
+<pre><code class="language-bash">% helm upgrade mysite bitnami/drupal --reuse-values
+</code></pre>
+<p>But it is not recommended</p>
+<h2 id="uninstalling-charts"><a class="header" href="#uninstalling-charts">Uninstalling charts</a></h2>
+<p>Not much to say here</p>
+<pre><code class="language-bash">% helm uninstall mysite
+</code></pre>
+<p>Works as you would expect, if you would do</p>
+<pre><code>% helm list
+</code></pre>
+<p>You will not see it there.</p>
+<p>Lastly, you can see a special record that contain release information.</p>
+<pre><code class="language-bash">% k get secret
+</code></pre>
+<p>Helm stores there the info.</p>
+<p>If you uninstall you loose the history, so be careful. You could <code>helm uninstall --keep-history</code>. Good if you plan on doing <code>helm rollback</code>.</p>
+<p>That is pretty much the basics on helm.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-elastic-stack-elk"><a class="header" href="#-elastic-stack-elk">📈 Elastic Stack (ELK)</a></h1>
 <h1 id="table-of-contents-2"><a class="header" href="#table-of-contents-2">Table of contents</a></h1>
 <ul>
