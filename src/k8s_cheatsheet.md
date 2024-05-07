@@ -89,4 +89,10 @@ Some useful commands
     ...
     ```
 
+# Manage your context
 
+- Change namespace for current context
+
+    ```bash
+    % kubectl config set-context --current --namespace=<some ns>
+    ```
