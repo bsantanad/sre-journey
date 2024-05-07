@@ -881,6 +881,7 @@ Burns, Joe Beda, and Kelsey Hightower O'Reilly</em></a>.
 <li><a href="k8s_up_and_running.html#persisting-data-with-volumes">Persisting Data with Volumes</a></li>
 </ul>
 </li>
+<li><a href="k8s_up_and_running.html#labels-and-annotations">Labels and Annotations</a></li>
 </ul>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
 <aside>
@@ -1477,6 +1478,7 @@ specific to each container.</p>
     persistentVolumeClaim:
       claimName: my-pvc
 </code></pre>
+<h1 id="labels-and-annotations"><a class="header" href="#labels-and-annotations">Labels and Annotations</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-k8s-cheatsheet"><a class="header" href="#-k8s-cheatsheet">📝 k8s cheatsheet</a></h1>
 <p>Some useful commands</p>
 <blockquote>
@@ -1551,6 +1553,14 @@ containers will run.</p>
 node/node1 condition met
 node/node2 condition met
 ...
+</code></pre>
+</li>
+</ul>
+<h1 id="manage-your-context"><a class="header" href="#manage-your-context">Manage your context</a></h1>
+<ul>
+<li>
+<p>Change namespace for current context</p>
+<pre><code class="language-bash">% kubectl config set-context --current --namespace=&lt;some ns&gt;
 </code></pre>
 </li>
 </ul>
