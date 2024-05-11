@@ -228,7 +228,19 @@ Burns, Joe Beda, and Kelsey Hightower O'Reilly</em></a>.
 <li><a href="#persisting-data-with-volumes">Persisting Data with Volumes</a></li>
 </ul>
 </li>
-<li><a href="#labels-and-annotations">Labels and Annotations</a></li>
+<li><a href="#labels-and-annotations">Labels and Annotations</a>
+<ul>
+<li><a href="#labels">Labels</a>
+<ul>
+<li><a href="#applying-labels">Applying Labels</a></li>
+<li><a href="#modifying-labels">Modifying Labels</a></li>
+<li><a href="#label-selectors">Label Selectors</a></li>
+<li><a href="#labels-selector-in-manifests">Labels Selector in Manifests</a></li>
+</ul>
+</li>
+<li><a href="#annotations">Annotations</a></li>
+</ul>
+</li>
 </ul>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
 <aside>
@@ -826,6 +838,111 @@ specific to each container.</p>
       claimName: my-pvc
 </code></pre>
 <h1 id="labels-and-annotations"><a class="header" href="#labels-and-annotations">Labels and Annotations</a></h1>
+<p>K8s apps can grow in size and complexity real quick. We can use <em>labels</em>
+and <em>annotations</em> to help organize our k8s objects/resources as sets of
+things that map how we think about the app. Making it a bit more human
+accessible. Meaning we can group resources that make the most sense of the
+application.</p>
+<p>We have two tools that help with this.</p>
+<ul>
+<li><strong>Labels</strong>: key/value pairs, to attach identifying information  to the k8s
+obj/resource. You will be able to query based on this.</li>
+<li><strong>Annotations</strong>: set non-identifying information that libraries can leverage.
+These are not meant for querying</li>
+</ul>
+<h2 id="labels"><a class="header" href="#labels">Labels</a></h2>
+<p>Labels give identifying metadata for k8s objects. They are key/value pairs of
+strings.</p>
+<p>Keys are broken down into two parts</p>
+<ul>
+<li>Optional prefix name, separated by a slash.</li>
+<li>Key name, it must start and end with alphanumeric chars.</li>
+</ul>
+<p>Some examples:</p>
+<ul>
+<li><code>acme.com/app-version</code> - <code>1.0.0</code></li>
+<li><code>app.version</code> - <code>1.0.0</code></li>
+</ul>
+<h3 id="applying-labels"><a class="header" href="#applying-labels">Applying Labels</a></h3>
+<p>You can do it when doing the <code>k run</code> command. (Doubt that is the way you are
+using it but anyway):</p>
+<pre><code class="language-bash">k run alpaca-test \
+  --image=gcr.io/kuar-demo/kuard-amd64:green \
+  --labels="ver=1,app=alpaca,env=test"
+</code></pre>
+<p>You can also add it to the manifest of the resource you are using:</p>
+<pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: example-pod
+  labels:
+    ver: "1"
+    env: "test"
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+</code></pre>
+<p>After the objects have been created, you can do <code>--show-labels</code></p>
+<pre><code>k get deployments --show-labels
+</code></pre>
+<h3 id="modifying-labels"><a class="header" href="#modifying-labels">Modifying Labels</a></h3>
+<p>You can update the labels on objects after creating them:</p>
+<pre><code>k label deployemnts alpaca-test "canary=true"
+</code></pre>
+<p>Keep in mind that this will only update the label on the deployment itself, it
+wont affect any objects created by the deployment.</p>
+<p>In case you feel lazy you can replace <code>--show-labels</code> with <code>-L</code>.</p>
+<pre><code>k get deployemnts -L canary
+</code></pre>
+<p>To remove a label you add a dash-suffix</p>
+<pre><code>k label deployments alpaca-test "canary-"
+</code></pre>
+<h3 id="label-selectors"><a class="header" href="#label-selectors">Label Selectors</a></h3>
+<p>Okay so, how do we query this stuff? Using boolean expressions</p>
+<p>This will list only the pods that have ver label set to 2.</p>
+<pre><code>k get pods --selector="ver=2"
+</code></pre>
+<p>You can get a bit more creative:</p>
+<p>This is the AND operator:</p>
+<pre><code>k get pods --selector="app=bandicoot,ver=2"
+</code></pre>
+<p>You can kind of do the OR by:</p>
+<pre><code>k get pods --selector="app in (alpaca,bandicoot)"
+</code></pre>
+<p>You can also check if a label has been set by just using the key name:</p>
+<pre><code>k get deployments --selector="canary"
+</code></pre>
+<p>Check if  key is not in <code>value1</code> or <code>value2</code>:</p>
+<pre><code>k get pods --selector="key notin (value1, value2)"
+</code></pre>
+<p>You can combine them</p>
+<pre><code>k get pods --selector="ver=2,!canary"
+</code></pre>
+<h3 id="labels-selector-in-manifests"><a class="header" href="#labels-selector-in-manifests">Labels Selector in Manifests</a></h3>
+<p>Newer versions support doing something like this:</p>
+<pre><code>selector:
+  matchLabels:
+    app: alpaca
+  matchExpressions:
+    - {key: ver, operator: In, values: [1, 2]}
+</code></pre>
+<h2 id="annotations"><a class="header" href="#annotations">Annotations</a></h2>
+<p>This are only meant to assist tools and libraries, do not use them for queries.</p>
+<p>If you are wondering if something should be a label or an annotations, add
+information to an object as an annotation and promote it to a label if you find
+yourself wanting to use it in a selector.</p>
+<p>Usually annotations primary use is rolling deployments, they are used to track
+rollout status and provide the information for a roll back if needed.</p>
+<p>Annotations are defined in the <code>metadata</code> part of the  manifest:</p>
+<pre><code>...
+metadata:
+  annotations:
+    example.com/icon-url: "https://example.com/icon.png"
+...
+</code></pre>
 
                     </main>
 
