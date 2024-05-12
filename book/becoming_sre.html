@@ -230,7 +230,20 @@ It is an splendid book and no amount of notes I take will make it justice,
 </ul>
 </li>
 <li><a href="#a-day-in-the-life-of-an-sre">A Day in the Life of an SRE</a></li>
-<li><a href="#establishing-a-relationship-to-toil">Establishing a Relationship to Toil</a></li>
+<li><a href="#establishing-a-relationship-to-toil">Establishing a Relationship to Toil</a>
+<ul>
+<li><a href="#what-is-toil">What is toil?</a></li>
+<li><a href="#whose-toil-are-we-talking-about">Whose Toil Are We Talking About?</a></li>
+<li><a href="#why-do-sres-care-about-toil">Why do SREs Care about toil?</a></li>
+<li><a href="#early-vs-established-toil">Early vs Established Toil</a></li>
+<li><a href="#dealing-with-toil">Dealing with Toil</a>
+<ul>
+<li><a href="#intermediate-to-advanced-toil-reduction">Intermediate to Advanced Toil Reduction</a></li>
+</ul>
+</li>
+<li><a href="#go-remove-the-toil">Go Remove the Toil</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -809,6 +822,105 @@ looking for a different job.</p>
 </li>
 </ul>
 <h2 id="establishing-a-relationship-to-toil"><a class="header" href="#establishing-a-relationship-to-toil">Establishing a Relationship to Toil</a></h2>
+<blockquote>
+<p>If a human operator needs to touch  your system during normal operations, you
+have a bug. The definition of normal changes are your systems grow.</p>
+</blockquote>
+<blockquote>
+<p>Carla Geisser, Google SRE</p>
+</blockquote>
+<h3 id="what-is-toil"><a class="header" href="#what-is-toil">What is toil?</a></h3>
+<p>First of all we need to define toil. Toil is not the work you do not like to do
+or simply repetitive chores. Toil is the kind of work when running a production
+service, that to tends to be:</p>
+<ul>
+<li>
+<p>Manual
+Work like manually running a script that automates a task is still manual,
+the time that a human spends running the script is still toil time</p>
+</li>
+<li>
+<p>Repetitive
+Toil is work you do over and over.</p>
+</li>
+<li>
+<p>Automatable
+If human judgment is essential for the task, there is a good chance it is
+not toil.</p>
+</li>
+<li>
+<p>Tactical
+Toil is reactive rather than strategy-driven.</p>
+</li>
+<li>
+<p>Does not bring enduring value
+If your service is in the same state after you finished a task, the task
+was probably toil.</p>
+</li>
+<li>
+<p>O(n) with service growth
+If the work  involved scales linearly with the size of the service (traffic
+volume, service size) is it probably toil.</p>
+</li>
+</ul>
+<p>We need to have less toil because it tends to expand, if left unchecked  it can
+quickly fill 100% of everyone's time, and people will stop doing <em>Engineering
+Work</em>. What is that? Engineering work is novel and requires human judgment. It
+produces permanent improvement in your service and is guided by strategy.</p>
+<p>Now that we know what toil is, lets see the relationship SREs have to it.</p>
+<h3 id="whose-toil-are-we-talking-about"><a class="header" href="#whose-toil-are-we-talking-about">Whose Toil Are We Talking About?</a></h3>
+<p><em>Whose toil is it?</em> On opposed to other parts of SRE where we are customer
+focuses, here we need to focus on our toil, not the customers one. Sure, they
+might have a connection for example, operational toil (ours) is exposed to the
+customer if they have to go into 4 steps to make a request. But we need to keep
+the main focus on the operational toil.</p>
+<h3 id="why-do-sres-care-about-toil"><a class="header" href="#why-do-sres-care-about-toil">Why do SREs Care about toil?</a></h3>
+<p>An argument can be made that if you remove toil a system becomes more reliable,
+but the author suggests that sometimes this is not the case. An that SREs
+because of their nature, are inclined to  eliminate toil because of the
+following reasons.</p>
+<ul>
+<li>
+<p>Aesthetics
+SREs want to eliminate toil because if offends their aesthetic
+sensibilities. Toil is inelegant, inefficient, unnecessary, suboptimal,
+hard to look at. That simply is a reason to remove it.</p>
+</li>
+<li>
+<p>Money
+Orgs have many reasons to want their expensive people do work that is
+significant  that make the revenue forward, meaning the antithesis of toil.</p>
+</li>
+<li>
+<p>Job Satisfaction</p>
+</li>
+</ul>
+<h3 id="early-vs-established-toil"><a class="header" href="#early-vs-established-toil">Early vs Established Toil</a></h3>
+<p>When an app is developed it is likely to have more toil than once it is
+established. Why? Developers care about making a solution to a customer
+problem, not making their app be super operational. They can be, and that is
+why it is important that an SRE is in the room when planning the Architecture
+for the app, but it is likely that it will have more toil than an established
+one.</p>
+<p>It is important to note this, because now we can mentally prepare for it, we
+now know that there will be a finite period of work with a lot of toil, but it
+is expected and it will end.</p>
+<h3 id="dealing-with-toil"><a class="header" href="#dealing-with-toil">Dealing with Toil</a></h3>
+<p>Usually people just say, automate it, and the toil will go away. But the author
+propose the idea that similar to matter that toil is not created and cannot be
+destroyed just transformed.</p>
+<p>When you are automating a task, the toil did not disappeared it just got
+transformed into a different thing: <em>Complexity</em>. Usually this is a wise
+bargain to take, but it is important to keep in mind that it has its  trade
+offs.</p>
+<h4 id="intermediate-to-advanced-toil-reduction"><a class="header" href="#intermediate-to-advanced-toil-reduction">Intermediate to Advanced Toil Reduction</a></h4>
+<p>It is important to keep track of the toil we remove on individual systems,
+management will love to hear that X system required N manual steps and now it
+was automated and require N-4 steps. But once you pass that first stage you
+also need to start thinking. How can I reduce the toil we are going to have?</p>
+<h3 id="go-remove-the-toil"><a class="header" href="#go-remove-the-toil">Go Remove the Toil</a></h3>
+<p>That is pretty much it for this chapter, we defined what toil is and how to
+deal with it. Go and put in practice what you have read here.</p>
 
                     </main>
 
