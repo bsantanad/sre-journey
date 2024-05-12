@@ -513,3 +513,106 @@ SRE will wear
 
 
 ## Establishing a Relationship to Toil
+
+> If a human operator needs to touch  your system during normal operations, you
+> have a bug. The definition of normal changes are your systems grow.
+
+> Carla Geisser, Google SRE
+
+### What is toil?
+
+First of all we need to define toil. Toil is not the work you do not like to do
+or simply repetitive chores. Toil is the kind of work when running a production
+service, that to tends to be:
+
+- Manual
+    Work like manually running a script that automates a task is still manual,
+    the time that a human spends running the script is still toil time
+
+- Repetitive
+    Toil is work you do over and over.
+
+- Automatable
+    If human judgment is essential for the task, there is a good chance it is
+    not toil.
+
+- Tactical
+    Toil is reactive rather than strategy-driven.
+
+- Does not bring enduring value
+    If your service is in the same state after you finished a task, the task
+    was probably toil.
+
+- O(n) with service growth
+    If the work  involved scales linearly with the size of the service (traffic
+    volume, service size) is it probably toil.
+
+We need to have less toil because it tends to expand, if left unchecked  it can
+quickly fill 100% of everyone's time, and people will stop doing _Engineering
+Work_. What is that? Engineering work is novel and requires human judgment. It
+produces permanent improvement in your service and is guided by strategy.
+
+Now that we know what toil is, lets see the relationship SREs have to it.
+
+###  Whose Toil Are We Talking About?
+
+_Whose toil is it?_ On opposed to other parts of SRE where we are customer
+focuses, here we need to focus on our toil, not the customers one. Sure, they
+might have a connection for example, operational toil (ours) is exposed to the
+customer if they have to go into 4 steps to make a request. But we need to keep
+the main focus on the operational toil.
+
+### Why do SREs Care about toil?
+
+An argument can be made that if you remove toil a system becomes more reliable,
+but the author suggests that sometimes this is not the case. An that SREs
+because of their nature, are inclined to  eliminate toil because of the
+following reasons.
+
+- Aesthetics
+    SREs want to eliminate toil because if offends their aesthetic
+    sensibilities. Toil is inelegant, inefficient, unnecessary, suboptimal,
+    hard to look at. That simply is a reason to remove it.
+
+- Money
+    Orgs have many reasons to want their expensive people do work that is
+    significant  that make the revenue forward, meaning the antithesis of toil.
+
+- Job Satisfaction
+
+### Early vs Established Toil
+
+When an app is developed it is likely to have more toil than once it is
+established. Why? Developers care about making a solution to a customer
+problem, not making their app be super operational. They can be, and that is
+why it is important that an SRE is in the room when planning the Architecture
+for the app, but it is likely that it will have more toil than an established
+one.
+
+It is important to note this, because now we can mentally prepare for it, we
+now know that there will be a finite period of work with a lot of toil, but it
+is expected and it will end.
+
+
+### Dealing with Toil
+
+Usually people just say, automate it, and the toil will go away. But the author
+propose the idea that similar to matter that toil is not created and cannot be
+destroyed just transformed.
+
+When you are automating a task, the toil did not disappeared it just got
+transformed into a different thing: _Complexity_. Usually this is a wise
+bargain to take, but it is important to keep in mind that it has its  trade
+offs.
+
+#### Intermediate to Advanced Toil Reduction
+
+It is important to keep track of the toil we remove on individual systems,
+management will love to hear that X system required N manual steps and now it
+was automated and require N-4 steps. But once you pass that first stage you
+also need to start thinking. How can I reduce the toil we are going to have?
+
+### Go Remove the Toil
+
+That is pretty much it for this chapter, we defined what toil is and how to
+deal with it. Go and put in practice what you have read here.
