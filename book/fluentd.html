@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>🐋 k8s up and running - 🍎 SRE Journey</title>
+        <title>🦜 Fluentd - 🍎 SRE Journey</title>
 
 
         <!-- Custom HTML head -->
@@ -88,7 +88,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> 🛶 Introduction</a></li><li class="chapter-item expanded "><a href="becoming_sre.html"><strong aria-hidden="true">2.</strong> 📚 Becoming SRE</a></li><li class="chapter-item expanded "><a href="k8s.html"><strong aria-hidden="true">3.</strong> ⛵️ k8s</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running.html" class="active"><strong aria-hidden="true">3.1.</strong> 🐋 k8s up and running</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running_1.html"><strong aria-hidden="true">3.1.1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_2.html"><strong aria-hidden="true">3.1.2.</strong> Deploying a k8s cluster</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_3.html"><strong aria-hidden="true">3.1.3.</strong> Common kubectl commands</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_4.html"><strong aria-hidden="true">3.1.4.</strong> Pods</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_5.html"><strong aria-hidden="true">3.1.5.</strong> Labels</a></li></ol></li><li class="chapter-item expanded "><a href="k8s_cheatsheet.html"><strong aria-hidden="true">3.2.</strong> 📝 k8s cheatsheet</a></li><li class="chapter-item expanded "><a href="helm.html"><strong aria-hidden="true">3.3.</strong> ⎈ helm</a></li></ol></li><li class="chapter-item expanded "><a href="fluentd.html"><strong aria-hidden="true">4.</strong> 🦜 Fluentd</a></li><li class="chapter-item expanded "><a href="elk_stack.html"><strong aria-hidden="true">5.</strong> 📈 ELK Stack</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> 🛶 Introduction</a></li><li class="chapter-item expanded "><a href="becoming_sre.html"><strong aria-hidden="true">2.</strong> 📚 Becoming SRE</a></li><li class="chapter-item expanded "><a href="k8s.html"><strong aria-hidden="true">3.</strong> ⛵️ k8s</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running.html"><strong aria-hidden="true">3.1.</strong> 🐋 k8s up and running</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running_1.html"><strong aria-hidden="true">3.1.1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_2.html"><strong aria-hidden="true">3.1.2.</strong> Deploying a k8s cluster</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_3.html"><strong aria-hidden="true">3.1.3.</strong> Common kubectl commands</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_4.html"><strong aria-hidden="true">3.1.4.</strong> Pods</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_5.html"><strong aria-hidden="true">3.1.5.</strong> Labels</a></li></ol></li><li class="chapter-item expanded "><a href="k8s_cheatsheet.html"><strong aria-hidden="true">3.2.</strong> 📝 k8s cheatsheet</a></li><li class="chapter-item expanded "><a href="helm.html"><strong aria-hidden="true">3.3.</strong> ⎈ helm</a></li></ol></li><li class="chapter-item expanded "><a href="fluentd.html" class="active"><strong aria-hidden="true">4.</strong> 🦜 Fluentd</a></li><li class="chapter-item expanded "><a href="elk_stack.html"><strong aria-hidden="true">5.</strong> 📈 ELK Stack</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -173,29 +173,60 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="-k8s-up-and-running"><a class="header" href="#-k8s-up-and-running">🐋 k8s up and running</a></h1>
-<blockquote>
-<p>⚠️ These are notes taken from the book <a href="https://learning.oreilly.com/library/view/kubernetes-up-and/9781098110192"><em>Kubernetes Up and Running by Brendan
-Burns, Joe Beda, and Kelsey Hightower O'Reilly</em></a>.
-<strong>Please go read it and just use this as reference</strong>.</p>
-</blockquote>
+                        <p><a href="https://www.youtube.com/watch?v=sIVGsQgMHIo&amp;t=44s">source</a></p>
+<h1 id="what-is-fluentd"><a class="header" href="#what-is-fluentd">What is Fluentd</a></h1>
+<p>It is a event/data collection tool. We can have multiple applications with tons
+of different logs formats. Fluentd tries to unify them.</p>
+<p>It is extensible, the core program is small, and does only the main stuff.</p>
 <ul>
-<li><a href="./k8s_up_and_running_1.html">Introduction</a></li>
-<li><a href="./k8s_up_and_running_2.html">Deploying a k8s cluster</a></li>
-<li><a href="./k8s_up_and_running_3.html">Common <code>kubectl</code> commands</a></li>
-<li><a href="./k8s_up_and_running_4.html">Pods</a></li>
-<li><a href="./k8s_up_and_running_5.html">Labels</a></li>
+<li>Divide &amp; Conquer</li>
+<li>Buffering &amp; Retries</li>
+<li>Error Handling</li>
+<li>Message Routing</li>
+<li>Parallelism</li>
 </ul>
+<p>It delegate the rest to the users via plugins, reading data, parsing data,
+buffering data, write data.</p>
+<p>It is reliable, it is important to not loose data. Fluentd tries to move the
+data in small pieces and checks if the data passed successfully if not it
+retries.</p>
+<p>Fluentd can tag the data and route it according to the label.</p>
+<h1 id="use-cases"><a class="header" href="#use-cases">Use Cases</a></h1>
+<h3 id="simple-forwarding"><a class="header" href="#simple-forwarding">Simple Forwarding</a></h3>
+<p>You have some simple files that and logs from a port and
+want to forward them to mongodb. Here is a simple configuration example.</p>
+<p>logs from a file</p>
+<pre><code>&lt;source&gt;
+    type tail
+    path /var/log/httpd.log 
+    format apache2
+    tag web.access
+&lt;/source&gt;
+</code></pre>
+<p>logs from client libraries</p>
+<pre><code>&lt;source&gt;
+    type forward 
+    port 24224
+&lt;/source&gt;
+</code></pre>
+<p>store logs to ES and HDFS</p>
+<pre><code>&lt;source backend.* &gt;
+    type mongo 
+    database fluent
+    collection test
+&lt;/source&gt;
+</code></pre>
+<h1 id="lambda-architecture"><a class="header" href="#lambda-architecture">Lambda Architecture</a></h1>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="k8s.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="helm.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="k8s_up_and_running_1.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="elk_stack.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -205,11 +236,11 @@ Burns, Joe Beda, and Kelsey Hightower O'Reilly</em></a>.
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="k8s.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="helm.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="k8s_up_and_running_1.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="elk_stack.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

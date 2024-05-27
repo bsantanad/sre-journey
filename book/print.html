@@ -89,7 +89,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> 🛶 Introduction</a></li><li class="chapter-item expanded "><a href="becoming_sre.html"><strong aria-hidden="true">2.</strong> 📚 Becoming SRE</a></li><li class="chapter-item expanded "><a href="k8s.html"><strong aria-hidden="true">3.</strong> ⛵️ k8s</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running.html"><strong aria-hidden="true">3.1.</strong> 🐋 k8s up and running</a></li><li class="chapter-item expanded "><a href="k8s_cheatsheet.html"><strong aria-hidden="true">3.2.</strong> 📝 k8s cheatsheet</a></li><li class="chapter-item expanded "><a href="helm.html"><strong aria-hidden="true">3.3.</strong> ⎈ helm</a></li></ol></li><li class="chapter-item expanded "><a href="elk_stack.html"><strong aria-hidden="true">4.</strong> 📈 ELK Stack</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> 🛶 Introduction</a></li><li class="chapter-item expanded "><a href="becoming_sre.html"><strong aria-hidden="true">2.</strong> 📚 Becoming SRE</a></li><li class="chapter-item expanded "><a href="k8s.html"><strong aria-hidden="true">3.</strong> ⛵️ k8s</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running.html"><strong aria-hidden="true">3.1.</strong> 🐋 k8s up and running</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running_1.html"><strong aria-hidden="true">3.1.1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_2.html"><strong aria-hidden="true">3.1.2.</strong> Deploying a k8s cluster</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_3.html"><strong aria-hidden="true">3.1.3.</strong> Common kubectl commands</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_4.html"><strong aria-hidden="true">3.1.4.</strong> Pods</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_5.html"><strong aria-hidden="true">3.1.5.</strong> Labels</a></li></ol></li><li class="chapter-item expanded "><a href="k8s_cheatsheet.html"><strong aria-hidden="true">3.2.</strong> 📝 k8s cheatsheet</a></li><li class="chapter-item expanded "><a href="helm.html"><strong aria-hidden="true">3.3.</strong> ⎈ helm</a></li></ol></li><li class="chapter-item expanded "><a href="fluentd.html"><strong aria-hidden="true">4.</strong> 🦜 Fluentd</a></li><li class="chapter-item expanded "><a href="elk_stack.html"><strong aria-hidden="true">5.</strong> 📈 ELK Stack</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -936,7 +936,7 @@ deal with it. Go and put in practice what you have read here.</p>
 </ul>
 <p>Things surrounding k8s</p>
 <ul>
-<li><a href="/k8s_cheatsheet.html">⎈ helm</a> (it has a really good intro on k8s)</li>
+<li><a href="/helm.html">⎈ helm</a> (it has a really good intro on k8s)</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-k8s-up-and-running"><a class="header" href="#-k8s-up-and-running">🐋 k8s up and running</a></h1>
 <blockquote>
@@ -944,70 +944,14 @@ deal with it. Go and put in practice what you have read here.</p>
 Burns, Joe Beda, and Kelsey Hightower O'Reilly</em></a>.
 <strong>Please go read it and just use this as reference</strong>.</p>
 </blockquote>
-<h1 id="table-of-contents-1"><a class="header" href="#table-of-contents-1">Table of Contents</a></h1>
 <ul>
-<li><a href="k8s_up_and_running.html#introduction">Introduction</a>
-<ul>
-<li><a href="k8s_up_and_running.html#development-velocity">Development Velocity</a></li>
-<li><a href="k8s_up_and_running.html#scaling-your-service-and-your-teams">Scaling Your Service and Your Teams</a>
-<ul>
-<li><a href="k8s_up_and_running.html#decoupling">Decoupling</a></li>
-<li><a href="k8s_up_and_running.html#scaling-for-applications-and-clusters">Scaling for Applications and Clusters</a></li>
-<li><a href="k8s_up_and_running.html#scaling-development-teams">Scaling Development Teams</a></li>
-<li><a href="k8s_up_and_running.html#separation-of-concerns-for-consistency-and-scaling">Separation of Concerns for Consistency and Scaling</a></li>
+<li><a href="./k8s_up_and_running_1.html">Introduction</a></li>
+<li><a href="./k8s_up_and_running_2.html">Deploying a k8s cluster</a></li>
+<li><a href="./k8s_up_and_running_3.html">Common <code>kubectl</code> commands</a></li>
+<li><a href="./k8s_up_and_running_4.html">Pods</a></li>
+<li><a href="./k8s_up_and_running_5.html">Labels</a></li>
 </ul>
-</li>
-<li><a href="k8s_up_and_running.html#abstracting-you-infrastructure">Abstracting You Infrastructure</a></li>
-<li><a href="k8s_up_and_running.html#efficiency">Efficiency</a></li>
-<li><a href="k8s_up_and_running.html#cloud-native-ecosystem">Cloud Native Ecosystem</a></li>
-<li><a href="k8s_up_and_running.html#summary">Summary</a></li>
-</ul>
-</li>
-<li><a href="k8s_up_and_running.html#deploying-a-k8s-cluster">Deploying a k8s cluster</a>
-<ul>
-<li><a href="k8s_up_and_running.html#cluster-components">Cluster Components</a></li>
-</ul>
-</li>
-<li><a href="k8s_up_and_running.html#common-kubectl-commands">Common <code>kubectl</code> commands</a>
-<ul>
-<li><a href="k8s_up_and_running.html#namespaces">Namespaces</a></li>
-<li><a href="k8s_up_and_running.html#contexts">Contexts</a></li>
-<li><a href="k8s_up_and_running.html#viewing-k8s-api-objects">Viewing k8s API Objects</a></li>
-<li><a href="k8s_up_and_running.html#creating-updating-and-destroying-k8s-objects">Creating, updating and destroying k8s objects</a></li>
-<li><a href="k8s_up_and_running.html#labeling-and-annotating-objects">Labeling and Annotating Objects</a></li>
-<li><a href="k8s_up_and_running.html#debugging-commands">Debugging Commands</a></li>
-<li><a href="k8s_up_and_running.html#cluster-management">Cluster Management</a></li>
-</ul>
-</li>
-<li><a href="k8s_up_and_running.html#pods">Pods</a>
-<ul>
-<li><a href="k8s_up_and_running.html#thinking-in-pods">Thinking in Pods</a></li>
-<li><a href="k8s_up_and_running.html#the-pod-manifest">The Pod Manifest</a>
-<ul>
-<li><a href="k8s_up_and_running.html#creating-a-manifest">Creating a manifest</a></li>
-</ul>
-</li>
-<li><a href="k8s_up_and_running.html#some-useful-commands">Some Useful Commands</a></li>
-<li><a href="k8s_up_and_running.html#health-checks">Health Checks</a></li>
-<li><a href="k8s_up_and_running.html#resource-management">Resource Management</a></li>
-<li><a href="k8s_up_and_running.html#persisting-data-with-volumes">Persisting Data with Volumes</a></li>
-</ul>
-</li>
-<li><a href="k8s_up_and_running.html#labels-and-annotations">Labels and Annotations</a>
-<ul>
-<li><a href="k8s_up_and_running.html#labels">Labels</a>
-<ul>
-<li><a href="k8s_up_and_running.html#applying-labels">Applying Labels</a></li>
-<li><a href="k8s_up_and_running.html#modifying-labels">Modifying Labels</a></li>
-<li><a href="k8s_up_and_running.html#label-selectors">Label Selectors</a></li>
-<li><a href="k8s_up_and_running.html#labels-selector-in-manifests">Labels Selector in Manifests</a></li>
-</ul>
-</li>
-<li><a href="k8s_up_and_running.html#annotations">Annotations</a></li>
-</ul>
-</li>
-</ul>
-<h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
 <aside>
 💡 K8s is an open source orchestrator for deploying containerized applications
 </aside>
@@ -1143,7 +1087,7 @@ going from less mature to most mature.</p>
 <h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
 <p>Fundamentally k8s was design to give developers more velocity efficiency and
 agility. Now that we have seen why to use it, lets see how to use it.</p>
-<h1 id="deploying-a-k8s-cluster"><a class="header" href="#deploying-a-k8s-cluster">Deploying a k8s cluster</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="deploying-a-k8s-cluster"><a class="header" href="#deploying-a-k8s-cluster">Deploying a k8s cluster</a></h1>
 <p>You can use a cloud provider, deploying on  bare-metal quite hard, other good
 alternatives.</p>
 <p><a href="http://kind.sigs.k8s.io/docs/user/configuration/">http://kind.sigs.k8s.io</a>
@@ -1233,7 +1177,7 @@ cluster</p>
 </code></pre>
 </li>
 </ul>
-<h1 id="common-kubectl-commands"><a class="header" href="#common-kubectl-commands">Common <code>kubectl</code> commands</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="common-kubectl-commands"><a class="header" href="#common-kubectl-commands">Common <code>kubectl</code> commands</a></h1>
 <blockquote>
 <p>I will repeat the commands here and in the page: <a href="/k8s_cheatsheet.html">k8s
 cheatsheet</a> but I will go a bit more into detail here.
@@ -1377,7 +1321,7 @@ are.</p>
 <p>Useful for removing physical machine for repairs or upgrades. You would do <code>k cordon</code> and then <code>k drain</code> to safely remove the machine form the cluster.</p>
 <p>Once the system is back online do <code>k uncordon</code> there is no <code>undrain</code> it will
 naturally get back to normal.</p>
-<h1 id="pods"><a class="header" href="#pods">Pods</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pods"><a class="header" href="#pods">Pods</a></h1>
 <p>K8s groups multiple containers into a single atomic unit called a <em>pod</em> (This
 also goes with the docker theme, since a group of whales is a pod lol)</p>
 <p>A pod is a collection of app containers and volumes running in the same
@@ -1602,7 +1546,7 @@ specific to each container.</p>
     persistentVolumeClaim:
       claimName: my-pvc
 </code></pre>
-<h1 id="labels-and-annotations"><a class="header" href="#labels-and-annotations">Labels and Annotations</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="labels-and-annotations"><a class="header" href="#labels-and-annotations">Labels and Annotations</a></h1>
 <p>K8s apps can grow in size and complexity real quick. We can use <em>labels</em>
 and <em>annotations</em> to help organize our k8s objects/resources as sets of
 things that map how we think about the app. Making it a bit more human
@@ -2201,8 +2145,52 @@ or upgrade.</p>
 <p>Helm stores there the info.</p>
 <p>If you uninstall you loose the history, so be careful. You could <code>helm uninstall --keep-history</code>. Good if you plan on doing <code>helm rollback</code>.</p>
 <p>That is pretty much the basics on helm.</p>
+<div style="break-before: page; page-break-before: always;"></div><p><a href="https://www.youtube.com/watch?v=sIVGsQgMHIo&amp;t=44s">source</a></p>
+<h1 id="what-is-fluentd"><a class="header" href="#what-is-fluentd">What is Fluentd</a></h1>
+<p>It is a event/data collection tool. We can have multiple applications with tons
+of different logs formats. Fluentd tries to unify them.</p>
+<p>It is extensible, the core program is small, and does only the main stuff.</p>
+<ul>
+<li>Divide &amp; Conquer</li>
+<li>Buffering &amp; Retries</li>
+<li>Error Handling</li>
+<li>Message Routing</li>
+<li>Parallelism</li>
+</ul>
+<p>It delegate the rest to the users via plugins, reading data, parsing data,
+buffering data, write data.</p>
+<p>It is reliable, it is important to not loose data. Fluentd tries to move the
+data in small pieces and checks if the data passed successfully if not it
+retries.</p>
+<p>Fluentd can tag the data and route it according to the label.</p>
+<h1 id="use-cases"><a class="header" href="#use-cases">Use Cases</a></h1>
+<h3 id="simple-forwarding"><a class="header" href="#simple-forwarding">Simple Forwarding</a></h3>
+<p>You have some simple files that and logs from a port and
+want to forward them to mongodb. Here is a simple configuration example.</p>
+<p>logs from a file</p>
+<pre><code>&lt;source&gt;
+    type tail
+    path /var/log/httpd.log 
+    format apache2
+    tag web.access
+&lt;/source&gt;
+</code></pre>
+<p>logs from client libraries</p>
+<pre><code>&lt;source&gt;
+    type forward 
+    port 24224
+&lt;/source&gt;
+</code></pre>
+<p>store logs to ES and HDFS</p>
+<pre><code>&lt;source backend.* &gt;
+    type mongo 
+    database fluent
+    collection test
+&lt;/source&gt;
+</code></pre>
+<h1 id="lambda-architecture"><a class="header" href="#lambda-architecture">Lambda Architecture</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-elastic-stack-elk"><a class="header" href="#-elastic-stack-elk">📈 Elastic Stack (ELK)</a></h1>
-<h1 id="table-of-contents-2"><a class="header" href="#table-of-contents-2">Table of contents</a></h1>
+<h1 id="table-of-contents-1"><a class="header" href="#table-of-contents-1">Table of contents</a></h1>
 <ul>
 <li><a href="elk_stack.html#components">Components</a></li>
 <li><a href="elk_stack.html#logstash">Logstash</a>
