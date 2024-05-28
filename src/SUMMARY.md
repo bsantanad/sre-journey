@@ -9,6 +9,7 @@
         - [Common `kubectl` commands](./k8s_up_and_running_3.md)
         - [Pods](./k8s_up_and_running_4.md)
         - [Labels](./k8s_up_and_running_5.md)
+        - [Services](./k8s_up_and_running_5.md)
     - [📝 k8s cheatsheet](./k8s_cheatsheet.md)
     - [⎈ helm](./helm.md)
 - [🦜 Fluentd](./fluentd.md)
