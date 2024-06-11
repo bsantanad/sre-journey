@@ -89,7 +89,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> 🛶 Introduction</a></li><li class="chapter-item expanded "><a href="becoming_sre.html"><strong aria-hidden="true">2.</strong> 📚 Becoming SRE</a></li><li class="chapter-item expanded "><a href="k8s.html"><strong aria-hidden="true">3.</strong> ⛵️ k8s</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running.html"><strong aria-hidden="true">3.1.</strong> 🐋 k8s up and running</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running_1.html"><strong aria-hidden="true">3.1.1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_2.html"><strong aria-hidden="true">3.1.2.</strong> Deploying a k8s cluster</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_3.html"><strong aria-hidden="true">3.1.3.</strong> Common kubectl commands</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_4.html"><strong aria-hidden="true">3.1.4.</strong> Pods</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_5.html"><strong aria-hidden="true">3.1.5.</strong> Labels</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_6.html"><strong aria-hidden="true">3.1.6.</strong> Services</a></li></ol></li><li class="chapter-item expanded "><a href="k8s_cheatsheet.html"><strong aria-hidden="true">3.2.</strong> 📝 k8s cheatsheet</a></li><li class="chapter-item expanded "><a href="helm.html"><strong aria-hidden="true">3.3.</strong> ⎈ helm</a></li></ol></li><li class="chapter-item expanded "><a href="fluentd.html"><strong aria-hidden="true">4.</strong> 🦜 Fluentd</a></li><li class="chapter-item expanded "><a href="elk_stack.html"><strong aria-hidden="true">5.</strong> 📈 ELK Stack</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> 🛶 Introduction</a></li><li class="chapter-item expanded "><a href="becoming_sre.html"><strong aria-hidden="true">2.</strong> 📚 Becoming SRE</a></li><li class="chapter-item expanded "><a href="k8s.html"><strong aria-hidden="true">3.</strong> ⛵️ k8s</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running.html"><strong aria-hidden="true">3.1.</strong> 🐋 k8s up and running</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running_1.html"><strong aria-hidden="true">3.1.1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_2.html"><strong aria-hidden="true">3.1.2.</strong> Deploying a k8s cluster</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_3.html"><strong aria-hidden="true">3.1.3.</strong> Common kubectl commands</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_4.html"><strong aria-hidden="true">3.1.4.</strong> Pods</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_5.html"><strong aria-hidden="true">3.1.5.</strong> Labels</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_6.html"><strong aria-hidden="true">3.1.6.</strong> Services</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_13.html"><strong aria-hidden="true">3.1.7.</strong> ConfigMap and Secrets</a></li></ol></li><li class="chapter-item expanded "><a href="k8s_cheatsheet.html"><strong aria-hidden="true">3.2.</strong> 📝 k8s cheatsheet</a></li><li class="chapter-item expanded "><a href="helm.html"><strong aria-hidden="true">3.3.</strong> ⎈ helm</a></li></ol></li><li class="chapter-item expanded "><a href="fluentd.html"><strong aria-hidden="true">4.</strong> 🦜 Fluentd</a></li><li class="chapter-item expanded "><a href="elk_stack.html"><strong aria-hidden="true">5.</strong> 📈 ELK Stack</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -1714,6 +1714,305 @@ spec:
 </code></pre>
 <p>Now each request that is send to the service will be randomly directed to one
 of the pods that implements the service.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="configmaps-and-secrets"><a class="header" href="#configmaps-and-secrets">ConfigMaps and Secrets</a></h1>
+<p>A good practice is to make your container images reusable, making a general
+purpose one that can be used across applications. But we might also need to add
+some configuration to the image at runtime. Here is where ConfigMaps and
+Secrets come into play.</p>
+<ul>
+<li><a href="k8s_up_and_running_13.html#configmaps">ConfigMaps</a>
+<ul>
+<li><a href="k8s_up_and_running_13.html#creating-configmaps">Creating ConfigMaps</a></li>
+<li><a href="k8s_up_and_running_13.html#using-a-configmap">Using a ConfigMap</a></li>
+</ul>
+</li>
+<li><a href="k8s_up_and_running_13.html#secrets">Secrets</a>
+<ul>
+<li><a href="k8s_up_and_running_13.html#creating-secrets">Creating Secrets</a></li>
+<li><a href="k8s_up_and_running_13.html#consuming-secrets">Consuming Secrets</a>
+<ul>
+<li><a href="k8s_up_and_running_13.html#private-container-registries">Private Container Registries</a></li>
+</ul>
+</li>
+<li><a href="k8s_up_and_running_13.html#naming-constrains">Naming Constrains</a></li>
+<li><a href="k8s_up_and_running_13.html#managing-configmaps-and-secrets">Managing ConfigMaps and Secrets</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="configmaps"><a class="header" href="#configmaps">ConfigMaps</a></h2>
+<p>In a ConfigMap you can define env variables, command line arguments or even
+small file systems for your containers. The <code>configmap</code> is combined with the Pod
+right before it is run.</p>
+<h3 id="creating-configmaps"><a class="header" href="#creating-configmaps">Creating ConfigMaps</a></h3>
+<p>We can create a <code>configmap</code> out of a file. Say for example we have a file
+called <code>config.txt</code>:</p>
+<pre><code>parameter1 = value1
+parameter2 = value2
+</code></pre>
+<p>You can create a <code>configmap</code> by doing:</p>
+<pre><code class="language-bash">% k create configmap config --from-file=config.txt
+</code></pre>
+<p>Or you can create literally from the command line</p>
+<pre><code class="language-bash">% k create configmap other-config --from-literal=some-param=some-value
+</code></pre>
+<p>Now you can list them</p>
+<pre><code class="language-bash">% k get cm
+NAME               DATA   AGE
+config             1      35s
+some-config        1      2s
+</code></pre>
+<p>And get them as <code>yaml</code>s</p>
+<pre><code>% k get cm config -o yaml
+apiVersion: v1
+data:
+  config.txt: |
+    param1 = value1
+    param2 = value2
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2024-06-11T00:58:10Z"
+  name: config
+  namespace: default
+  resourceVersion: "2420"
+  uid: 7df23db6-7d2c-4db4-9b22-5fecd4bb456e
+</code></pre>
+<p>At the end of the day, the <code>configmaps</code> are just some key/value pairs stores in
+an object.</p>
+<h3 id="using-a-configmap"><a class="header" href="#using-a-configmap">Using a ConfigMap</a></h3>
+<p>There are 3 ways of using them:</p>
+<ul>
+<li>File system:
+<ul>
+<li>A ConfigMap can be mounted in a Pod. A file is created for each key, and
+the content is their respective values</li>
+</ul>
+</li>
+<li>Command-line Argument:
+<ul>
+<li>Creating command lines dynamically</li>
+</ul>
+</li>
+<li>Environment Variable:
+<ul>
+<li>It can set the value of an environment variable</li>
+</ul>
+</li>
+</ul>
+<p>Let's see each as an example</p>
+<ul>
+<li>File System Volumes</li>
+</ul>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata
+  name: kuard-config
+spec:
+  containers:
+    - name: test-container
+      image: gcr.io/kuar-demo/kaurd-amd64:blue
+      imagePullPolicy: Always
+      command:
+        - "/kuard"
+    volumeMounts:
+    # Mounting the ConfigMap as a set of files
+    - name: config-volume # &lt;- HERE
+      mountPath: /config
+  volumes:
+    - name: config-volume # &lt;- HERE
+      configMap:
+        name: config # &lt;- name of the cm we just created
+  restartPolicy: Never
+</code></pre>
+<ul>
+<li>Command-line Arguments</li>
+</ul>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata
+  name: kuard-config
+spec:
+  containers:
+    - name: test-container
+      image: gcr.io/kuar-demo/kaurd-amd64:blue
+      imagePullPolicy: Always
+      command:
+        - "/kuard"
+        - "$(EXTRA_PARAM)" &lt;- NOTE HERE
+      env:
+        - name: EXTRA_PARAM
+            valueFrom:
+            configMapKeyRef
+            name: config # &lt;- name of the cm we just created
+            key: param1
+</code></pre>
+<blockquote>
+<p><strong>Note</strong> that k8s will perform the correct substitution with a special
+<code>$(&lt;env-var-name&gt; )</code> syntax</p>
+</blockquote>
+<ul>
+<li>Environment Variable:</li>
+</ul>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata
+  name: kuard-config
+spec:
+  containers:
+    - name: test-container
+      image: gcr.io/kuar-demo/kaurd-amd64:blue
+      imagePullPolicy: Always
+      command:
+        - "/kuard"
+      env:
+        - name: ENV_PARAM
+            valueFrom:
+            configMapKeyRef
+            name: config # &lt;- name of the cm we just created
+            key: param2
+</code></pre>
+<h2 id="secrets"><a class="header" href="#secrets">Secrets</a></h2>
+<p>This are pretty similar to ConfigMaps but they are intended for sensitive
+information, for example, passwords, tokens, private keys, TLS certs.</p>
+<p>This secrets are exposed to Pods via explicit declaration in the Pod manifest
+and the k8s API.</p>
+<blockquote>
+<p>By default k8s stores secrets in plain text on <code>etcd</code> storage. If you have
+super sensitive information there, and a lot of people with admin access,
+might be worth encrypting it a bit more.</p>
+</blockquote>
+<h3 id="creating-secrets"><a class="header" href="#creating-secrets">Creating Secrets</a></h3>
+<p>We can create a secret like any other resource</p>
+<pre><code>% k create secret generic my-secret --from-file=some.key
+</code></pre>
+<p>Instead of <code>generic</code> -- depending on the secret -- we can use different types</p>
+<p>From the manpage</p>
+<pre><code class="language-bash">Available Commands:
+  docker-registry   Create a secret for use with a Docker registry
+  generic           Create a secret from a local file, directory, or literal value
+  tls               Create a TLS secret
+</code></pre>
+<p>If we describe it</p>
+<pre><code>% k describe secret my-secret
+Name:         my-secret
+Namespace:    default
+Labels:       &lt;none&gt;
+Annotations:  &lt;none&gt;
+
+Type:  Opaque
+
+Data
+====
+some.key:  1984 bytes
+</code></pre>
+<p>The Pods consume the secrets.</p>
+<h3 id="consuming-secrets"><a class="header" href="#consuming-secrets">Consuming Secrets</a></h3>
+<p>We can call the API directly, but more often we will access secrets from a
+<em>Secrets Volume</em>. These volumes are created at pod creation time, and are
+stored in <code>tmpfs</code> (meaning memory not disk).</p>
+<p>Each secret is in a different file under the target mount point. So if we mount
+the <code>my-secret</code> secret in the <code>/keys</code> directory, it would looks something like
+<code>/keys/some.key</code>.</p>
+<p>The Pod manifest would end up looking something like this:</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata
+  name: kuard-secret
+spec:
+  containers:
+    - name: test-container
+      image: gcr.io/kuar-demo/kaurd-amd64:blue
+      imagePullPolicy: Always
+    volumeMounts:
+    - name: keys
+      mountPath: /keys
+      readOnly: true
+  volumes:
+    - name: keys
+      secret:
+        secretName: my-secret # &lt;- name of the secret we just created
+</code></pre>
+<h4 id="private-container-registries"><a class="header" href="#private-container-registries">Private Container Registries</a></h4>
+<p>You can also create a secret for for use with a Docker registry. Instead of
+<code>generic</code> you would use <code>docker-registry</code>, with <code>--docker-username</code>,
+<code>--docker-password</code> and <code>--docker-email</code> and the manifest would look something
+like this:</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata
+  name: kuard-secret
+spec:
+  containers:
+    - name: test-container
+      image: gcr.io/kuar-demo/kaurd-amd64:blue
+      imagePullPolicy: Always
+    volumeMounts:
+    - name: keys
+      mountPath: /keys
+      readOnly: true
+  imagePullSecrets:
+  - name: my-image-pull-secrets-from-registry # &lt;- name of that secret
+  volumes:
+    - name: keys
+      secret:
+        secretName: my-secret
+</code></pre>
+<h3 id="naming-constrains"><a class="header" href="#naming-constrains">Naming Constrains</a></h3>
+<p>Key names need to be valid variable names. Just use <em>normal</em> names and you will
+be fine.</p>
+<ul>
+<li>
+<p>valid</p>
+<ul>
+<li><code>.token</code></li>
+<li><code>secret.token</code></li>
+<li><code>config_file</code></li>
+</ul>
+</li>
+<li>
+<p>not valid</p>
+<ul>
+<li><code>token..key</code></li>
+<li><code>auth token.key</code></li>
+<li><code>_token</code></li>
+</ul>
+</li>
+</ul>
+<p>Just not use spaces, double dots and stuff like that.</p>
+<h3 id="managing-configmaps-and-secrets"><a class="header" href="#managing-configmaps-and-secrets">Managing ConfigMaps and Secrets</a></h3>
+<p>The usual stuff, <code>get</code>, <code>delete</code>, <code>create</code>. Just a note on creating:</p>
+<ul>
+<li><code>--from-file=&lt;filename&gt;</code>: keys in file will be keys in secret</li>
+<li><code>--from-file=&lt;key&gt;=&lt;filename&gt;</code>: keys in file will be keys in secret
+<ul>
+<li>Instead of:
+<pre><code>  Data
+  ====
+  &lt;filename&gt;:
+  ----
+  param1 = value1
+  param2 = value2
+</code></pre>
+You would get
+<pre><code>  Data
+  ====
+  &lt;key&gt;:
+  ----
+  param1 = value1
+  param2 = value2
+</code></pre>
+</li>
+</ul>
+</li>
+<li><code>--from-file=&lt;directory&gt;</code>: loads all files in a directory</li>
+</ul>
+<p>Also you can recreate and update like:</p>
+<pre><code>kubectl create secret generic kuard-tls \
+  --from-file=kuard.crt --from-file=kuard.key \
+  --dry-run -o yaml | kubectl replace -f -
+</code></pre>
+<p>Neat trick from the book <a href="https://learning.oreilly.com/library/view/kubernetes-up-and/9781098110192"><em>Kubernetes Up and Running by Brendan Burns, Joe
+Beda, and Kelsey Hightower
+O'Reilly</em></a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-k8s-cheatsheet"><a class="header" href="#-k8s-cheatsheet">📝 k8s cheatsheet</a></h1>
 <p>Some useful commands</p>
 <blockquote>
@@ -1919,7 +2218,7 @@ spec:
 <p>A Pod can have 1 or more containers. The containers that help preconfigurate
 stuff for the main one, are called <em>init containers</em>.</p>
 <p>The ones that run alongside the main container are called <em>sidecar containers</em></p>
-<h3 id="configmaps"><a class="header" href="#configmaps"><code>ConfigMaps</code></a></h3>
+<h3 id="configmaps-1"><a class="header" href="#configmaps-1"><code>ConfigMaps</code></a></h3>
 <p>Basically in a pod you describe the configuration the containers need, like
 network ports files system mount points. You can store configuration
 information for k8s in <code>ConfigMaps</code> and password and stuff like that in
