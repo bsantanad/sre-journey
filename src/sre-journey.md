@@ -1,3 +1,3 @@
-# 🛶 SRE Journey 
+# 🛶 SRE Journey
 
 <!-- toc -->

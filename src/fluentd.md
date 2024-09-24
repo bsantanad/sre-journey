@@ -33,16 +33,16 @@ logs from a file
 ```
 <source>
     type tail
-    path /var/log/httpd.log 
+    path /var/log/httpd.log
     format apache2
     tag web.access
 </source>
 ```
 
-logs from client libraries 
+logs from client libraries
 ```
 <source>
-    type forward 
+    type forward
     port 24224
 </source>
 ```
@@ -50,11 +50,11 @@ logs from client libraries
 store logs to ES and HDFS
 ```
 <source backend.* >
-    type mongo 
+    type mongo
     database fluent
     collection test
 </source>
 ```
 
-# Lambda Architecture 
+# Lambda Architecture
 
