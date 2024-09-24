@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>🐿️ k8s in a Nutshell - 🍎 SRE Journey</title>
+        <title>Helm - 🍎 SRE Journey</title>
 
 
         <!-- Custom HTML head -->
@@ -88,7 +88,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> 🛶 Introduction</a></li><li class="chapter-item expanded "><a href="becoming_sre.html"><strong aria-hidden="true">2.</strong> 📚 Becoming SRE</a></li><li class="chapter-item expanded "><a href="k8s.html"><strong aria-hidden="true">3.</strong> ⛵️ k8s</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ckad_prep.html"><strong aria-hidden="true">3.1.</strong> 📜 CKAD prep</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ckad_prep_1.html" class="active"><strong aria-hidden="true">3.1.1.</strong> 🐿️ k8s in a Nutshell</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ckad_prep_2.html"><strong aria-hidden="true">3.1.1.1.</strong> Object Management</a></li></ol></li><li class="chapter-item expanded "><a href="ckad_prep_first_mod.html"><strong aria-hidden="true">3.1.2.</strong> 🐔 Application Design and Build</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ckad_prep_3.html"><strong aria-hidden="true">3.1.2.1.</strong> Container Images</a></li><li class="chapter-item expanded "><a href="ckad_prep_4.html"><strong aria-hidden="true">3.1.2.2.</strong> Pods</a></li><li class="chapter-item expanded "><a href="ckad_prep_5.html"><strong aria-hidden="true">3.1.2.3.</strong> Jobs and CronJobs</a></li><li class="chapter-item expanded "><a href="ckad_prep_6.html"><strong aria-hidden="true">3.1.2.4.</strong> Container Storage</a></li><li class="chapter-item expanded "><a href="ckad_prep_7.html"><strong aria-hidden="true">3.1.2.5.</strong> Multi-Container Pods</a></li><li class="chapter-item expanded "><a href="ckad_prep_8.html"><strong aria-hidden="true">3.1.2.6.</strong> Labels and Annotations</a></li></ol></li><li class="chapter-item expanded "><a href="ckad_prep_second_mod.html"><strong aria-hidden="true">3.1.3.</strong> 🐦 Application Deployment</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ckad_prep_9.html"><strong aria-hidden="true">3.1.3.1.</strong> Deployments</a></li><li class="chapter-item expanded "><a href="ckad_prep_10.html"><strong aria-hidden="true">3.1.3.2.</strong> Helm</a></li></ol></li><li class="chapter-item expanded "><a href="ckad_prep_third_mod.html"><strong aria-hidden="true">3.1.4.</strong> 🐤 Application Observability & Maintenance</a></li><li class="chapter-item expanded "><a href="ckad_focus.html"><strong aria-hidden="true">3.1.5.</strong> 🔬 Where to Focus</a></li></ol></li><li class="chapter-item expanded "><a href="k8s_up_and_running.html"><strong aria-hidden="true">3.2.</strong> 🐋 k8s up and running</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running_1.html"><strong aria-hidden="true">3.2.1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_2.html"><strong aria-hidden="true">3.2.2.</strong> Deploying a k8s cluster</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_3.html"><strong aria-hidden="true">3.2.3.</strong> Common kubectl commands</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_4.html"><strong aria-hidden="true">3.2.4.</strong> Pods</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_5.html"><strong aria-hidden="true">3.2.5.</strong> Labels</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_6.html"><strong aria-hidden="true">3.2.6.</strong> Services</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_13.html"><strong aria-hidden="true">3.2.7.</strong> ConfigMap and Secrets</a></li></ol></li><li class="chapter-item expanded "><a href="k8s_cheatsheet.html"><strong aria-hidden="true">3.3.</strong> 📝 k8s cheatsheet</a></li><li class="chapter-item expanded "><a href="helm.html"><strong aria-hidden="true">3.4.</strong> ⎈ helm</a></li></ol></li><li class="chapter-item expanded "><a href="fluentd.html"><strong aria-hidden="true">4.</strong> 🦜 Fluentd</a></li><li class="chapter-item expanded "><a href="elk_stack.html"><strong aria-hidden="true">5.</strong> 📈 ELK Stack</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> 🛶 Introduction</a></li><li class="chapter-item expanded "><a href="becoming_sre.html"><strong aria-hidden="true">2.</strong> 📚 Becoming SRE</a></li><li class="chapter-item expanded "><a href="k8s.html"><strong aria-hidden="true">3.</strong> ⛵️ k8s</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ckad_prep.html"><strong aria-hidden="true">3.1.</strong> 📜 CKAD prep</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ckad_prep_1.html"><strong aria-hidden="true">3.1.1.</strong> 🐿️ k8s in a Nutshell</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ckad_prep_2.html"><strong aria-hidden="true">3.1.1.1.</strong> Object Management</a></li></ol></li><li class="chapter-item expanded "><a href="ckad_prep_first_mod.html"><strong aria-hidden="true">3.1.2.</strong> 🐔 Application Design and Build</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ckad_prep_3.html"><strong aria-hidden="true">3.1.2.1.</strong> Container Images</a></li><li class="chapter-item expanded "><a href="ckad_prep_4.html"><strong aria-hidden="true">3.1.2.2.</strong> Pods</a></li><li class="chapter-item expanded "><a href="ckad_prep_5.html"><strong aria-hidden="true">3.1.2.3.</strong> Jobs and CronJobs</a></li><li class="chapter-item expanded "><a href="ckad_prep_6.html"><strong aria-hidden="true">3.1.2.4.</strong> Container Storage</a></li><li class="chapter-item expanded "><a href="ckad_prep_7.html"><strong aria-hidden="true">3.1.2.5.</strong> Multi-Container Pods</a></li><li class="chapter-item expanded "><a href="ckad_prep_8.html"><strong aria-hidden="true">3.1.2.6.</strong> Labels and Annotations</a></li></ol></li><li class="chapter-item expanded "><a href="ckad_prep_second_mod.html"><strong aria-hidden="true">3.1.3.</strong> 🐦 Application Deployment</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ckad_prep_9.html"><strong aria-hidden="true">3.1.3.1.</strong> Deployments</a></li><li class="chapter-item expanded "><a href="ckad_prep_10.html" class="active"><strong aria-hidden="true">3.1.3.2.</strong> Helm</a></li></ol></li><li class="chapter-item expanded "><a href="ckad_prep_third_mod.html"><strong aria-hidden="true">3.1.4.</strong> 🐤 Application Observability & Maintenance</a></li><li class="chapter-item expanded "><a href="ckad_focus.html"><strong aria-hidden="true">3.1.5.</strong> 🔬 Where to Focus</a></li></ol></li><li class="chapter-item expanded "><a href="k8s_up_and_running.html"><strong aria-hidden="true">3.2.</strong> 🐋 k8s up and running</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="k8s_up_and_running_1.html"><strong aria-hidden="true">3.2.1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_2.html"><strong aria-hidden="true">3.2.2.</strong> Deploying a k8s cluster</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_3.html"><strong aria-hidden="true">3.2.3.</strong> Common kubectl commands</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_4.html"><strong aria-hidden="true">3.2.4.</strong> Pods</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_5.html"><strong aria-hidden="true">3.2.5.</strong> Labels</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_6.html"><strong aria-hidden="true">3.2.6.</strong> Services</a></li><li class="chapter-item expanded "><a href="k8s_up_and_running_13.html"><strong aria-hidden="true">3.2.7.</strong> ConfigMap and Secrets</a></li></ol></li><li class="chapter-item expanded "><a href="k8s_cheatsheet.html"><strong aria-hidden="true">3.3.</strong> 📝 k8s cheatsheet</a></li><li class="chapter-item expanded "><a href="helm.html"><strong aria-hidden="true">3.4.</strong> ⎈ helm</a></li></ol></li><li class="chapter-item expanded "><a href="fluentd.html"><strong aria-hidden="true">4.</strong> 🦜 Fluentd</a></li><li class="chapter-item expanded "><a href="elk_stack.html"><strong aria-hidden="true">5.</strong> 📈 ELK Stack</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -173,51 +173,17 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="k8s-in-a-nutshell"><a class="header" href="#k8s-in-a-nutshell">k8s in a nutshell</a></h1>
-<aside>
-💡 For more in depth explanations, please go to
- [k8s up and running](./k8s_up_and_running.md)
-</aside>
-<h2 id="high-level-k8s-arch"><a class="header" href="#high-level-k8s-arch">High level k8s arch</a></h2>
-<p>A k8s cluster has two kind of nodes</p>
-<ul>
-<li><strong>control plane node</strong>: exposes the k8s API, so if you want to interact with
-the k8s cluster you need to go thru here.</li>
-<li><strong>worker node</strong>: nodes that execute the workload. Needs to have a container
-runtime engine installed (containerd) for executing the containers.</li>
-</ul>
-<h3 id="control-plane-node-components"><a class="header" href="#control-plane-node-components">Control Plane Node Components</a></h3>
-<ul>
-<li>API server: expose k8s api</li>
-<li>Scheduler: Watches for new k8s pods and assign to nodes</li>
-<li>Controller Manager: watches the state of cluster, and makes changes</li>
-<li>etcd: a key-value that captures the state of the objects we create in the
-cluster</li>
-</ul>
-<h3 id="common-node-components"><a class="header" href="#common-node-components">Common Node Components</a></h3>
-<p>Any node has these:</p>
-<ul>
-<li>
-<p>Kubelet: agent that makes sure the containers are running in a k8s pod,
-usually this one runs in the workers.</p>
-</li>
-<li>
-<p>kube proxy: maintain network rules and allow communication</p>
-</li>
-<li>
-<p>Container runtime: software responsible for running containers</p>
-</li>
-</ul>
+                        <h1 id="helm"><a class="header" href="#helm">Helm</a></h1>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="ckad_prep.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="ckad_prep_9.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="ckad_prep_2.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="ckad_prep_third_mod.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -227,11 +193,11 @@ usually this one runs in the workers.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="ckad_prep.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="ckad_prep_9.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="ckad_prep_2.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="ckad_prep_third_mod.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
