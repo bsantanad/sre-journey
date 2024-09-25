@@ -7,6 +7,7 @@ Some useful commands
 > in you mac? with podman?
 >
 > ```bash
+> podman machine init
 > podman machine start;
 > export KIND_EXPERIMENTAL_PROVIDER=podman;
 > kind create cluster
