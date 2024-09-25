@@ -39,3 +39,19 @@
 - The attributes that can be assigned to an `initContainers` section are the
   same as the containers section
 - Design patterns (Sidecar, Ambassador, etc). When to use and how to implement.
+
+## Labels and Annotations
+
+- Some primitives, Deployment, Service and Network Policy, use label selection
+  heavily.
+- Annotations are not made for querying, some reserved annotations may
+  influence runtime behaviour.
+
+## Deployments
+
+- When creating a deployment make sure label selection match with the pod
+  template.
+- Practice how to scale the number of replicas manually `--replicas` or via
+  `hpa` for thresholds.
+- be aware of the `k rollout undo`.
+- know how to apply the deployment strategies.
