@@ -174,6 +174,59 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="labels-and-annotations"><a class="header" href="#labels-and-annotations">Labels and Annotations</a></h1>
+<ul>
+<li><a href="#labels">Labels</a></li>
+<li><a href="#annotation">Annotation</a></li>
+</ul>
+<p>Labels:</p>
+<ul>
+<li>Key value pairs that can be assigned to an object</li>
+<li>They need to follow a naming convention, we can use them to filter objects</li>
+</ul>
+<p>Annotations:</p>
+<ul>
+<li>Represent human-readable metadata</li>
+<li>Not meant for query</li>
+</ul>
+<h2 id="labels"><a class="header" href="#labels">Labels</a></h2>
+<p>We can assign it with the imperative <code>label</code> command, or with
+<code>metadata.labels[]</code>.</p>
+<p>Not meant for elaborate. They have a max of 63 characters.</p>
+<p>We can add a label imperatively with:</p>
+<pre><code class="language-bash">k label pod nginx tier=backend env=prod app=viraccle
+</code></pre>
+<p>See pods with labels</p>
+<pre><code class="language-bash">k get pods --show-labels
+</code></pre>
+<p>To remove a label you put the key and a minus sign</p>
+<pre><code class="language-bash">k label pod nginx tier-
+</code></pre>
+<p>From a manifest.</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: label-demo
+  labels:
+    environment: production
+    app: nginx
+</code></pre>
+<p>We can use them to query stuff.</p>
+<pre><code class="language-bash">$ k get pods -l tier=frontend,env=dev --show-labels
+$ k get pods -l version --show-labels # only the key
+$ k get pods -l 'tier in (frontend,backend),env=dev' # create a query
+</code></pre>
+<p>There is other k8s objects that enforce policies or smth, and that can also use
+the labels to select to which pod you want to enforce them.  For example a
+<code>NetworkPolicy</code> can have <code>spec.podSelector.matchLabels.mylabel: frontend</code>.</p>
+<h2 id="annotation"><a class="header" href="#annotation">Annotation</a></h2>
+<p>Metadata without the ability to be queryable. Make sure to put the annotation
+in quotes, for handling spaces and stuff.</p>
+<p>A example could be the author, a commit hash, or a branch.</p>
+<pre><code class="language-bash">$ k annotate pod nginx  commit='866a8dc' branch='users/jloca/bug'
+</code></pre>
+<p>If we <code>describe</code> the object we will see our annotations there.</p>
+<p>There are some well-known annotations, <code>pod-security.kubernetes.io/warn: baseline</code>
+but that goes out of the scope of the course.</p>
 
                     </main>
 

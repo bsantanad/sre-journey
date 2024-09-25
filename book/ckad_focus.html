@@ -179,6 +179,9 @@
 <li><a href="#pods-and-namespaces">Pods and Namespaces</a></li>
 <li><a href="#cronjob-and-jobs">Cronjob and jobs</a></li>
 <li><a href="#volumes">Volumes</a></li>
+<li><a href="#multi-container-pods">Multi-Container Pods</a></li>
+<li><a href="#labels-and-annotations">Labels and Annotations</a></li>
+<li><a href="#deployments">Deployments</a></li>
 </ul>
 <h2 id="containers"><a class="header" href="#containers">Containers</a></h2>
 <ul>
@@ -213,6 +216,28 @@ runtime behaviour.</li>
 <li>dynamic, automatically created the pv</li>
 </ul>
 </li>
+</ul>
+<h2 id="multi-container-pods"><a class="header" href="#multi-container-pods">Multi-Container Pods</a></h2>
+<ul>
+<li>The attributes that can be assigned to an <code>initContainers</code> section are the
+same as the containers section</li>
+<li>Design patterns (Sidecar, Ambassador, etc). When to use and how to implement.</li>
+</ul>
+<h2 id="labels-and-annotations"><a class="header" href="#labels-and-annotations">Labels and Annotations</a></h2>
+<ul>
+<li>Some primitives, Deployment, Service and Network Policy, use label selection
+heavily.</li>
+<li>Annotations are not made for querying, some reserved annotations may
+influence runtime behaviour.</li>
+</ul>
+<h2 id="deployments"><a class="header" href="#deployments">Deployments</a></h2>
+<ul>
+<li>When creating a deployment make sure label selection match with the pod
+template.</li>
+<li>Practice how to scale the number of replicas manually <code>--replicas</code> or via
+<code>hpa</code> for thresholds.</li>
+<li>be aware of the <code>k rollout undo</code>.</li>
+<li>know how to apply the deployment strategies.</li>
 </ul>
 
                     </main>

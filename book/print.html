@@ -999,11 +999,14 @@ usually this one runs in the workers.</p>
 <pre><code class="language-bash">k create -f ngnix-pod.yaml
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="application-design-and-build"><a class="header" href="#application-design-and-build">Application Design and Build]</a></h1>
+<p>Here are the modules for this part of the cert.</p>
 <ol>
 <li><a href="ckad_prep_3.html">Container Images</a></li>
 <li><a href="ckad_prep_4.html">Pods</a></li>
 <li><a href="ckad_prep_5.html">Jobs and CronJobs</a></li>
 <li><a href="ckad_prep_6.html">Container Storage</a></li>
+<li><a href="./ckad_prep_7.html">Multi-Container Pods</a></li>
+<li><a href="./ckad_prep_8.html">Labels and Annotations</a></li>
 </ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="container-images"><a class="header" href="#container-images">Container Images</a></h1>
 <ul>
@@ -1337,9 +1340,265 @@ spec:
         name: app-storage
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="multi-container-pods"><a class="header" href="#multi-container-pods">Multi-Container Pods</a></h1>
+<p>In general we want to define 1 container per pod. That is the case when we want
+to operate a microservice on that container.</p>
+<p>But there are reasons to run multiple ones. For example, helper containers, run
+setup scripts, stuff like that.</p>
+<h2 id="design-patterns"><a class="header" href="#design-patterns">Design Patterns</a></h2>
+<p>Emerged from pod requirements</p>
+<ul>
+<li>
+<p>Init Container: initialization logic, that need to be run before the main app
+starts.</p>
+<ul>
+<li>Example: Downloading config files required by the application.</li>
+</ul>
+</li>
+<li>
+<p>Sidecar: containers not part of the main traffic the app receives, but will
+run along side the main app</p>
+<ul>
+<li>Example: Watcher capabilities.</li>
+</ul>
+</li>
+<li>
+<p>Adapter: Transform output produced by app into another format or smth that
+makes it more usable for another program.</p>
+<ul>
+<li>Example: Massaging log data</li>
+</ul>
+</li>
+<li>
+<p>Ambassador: Provides a proxy for communicating with external services. To
+abstract complexity.</p>
+<ul>
+<li>Example: providing credentials for auth.</li>
+</ul>
+</li>
+</ul>
+<h3 id="init-container"><a class="header" href="#init-container">Init Container</a></h3>
+<p>To define an <code>initContainer</code> you need to add this to your <code>yaml</code>.</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp
+spec:
+  initContainers:
+  - name: app-init
+    image: busybox:1.28
+    command: ['sh', '-c', "wget something.com/res.png"]
+  containers:
+  - name: myapp-container
+    image: busybox:1.28
+    command: ['sh', '-c', 'echo The app is running! &amp;&amp; sleep 3600']
+</code></pre>
+<p>When we start the pod, under <code>STATUS</code> you can see <code>Init:0/1</code> meaning it is
+creating the containers needed.</p>
+<p>We can talk with any of the containers using <code>--contianer</code> or <code>-c</code>.</p>
+<pre><code class="language-bash">k --container=init
+k --container=app
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="labels-and-annotations"><a class="header" href="#labels-and-annotations">Labels and Annotations</a></h1>
+<ul>
+<li><a href="ckad_prep_8.html#labels">Labels</a></li>
+<li><a href="ckad_prep_8.html#annotation">Annotation</a></li>
+</ul>
+<p>Labels:</p>
+<ul>
+<li>Key value pairs that can be assigned to an object</li>
+<li>They need to follow a naming convention, we can use them to filter objects</li>
+</ul>
+<p>Annotations:</p>
+<ul>
+<li>Represent human-readable metadata</li>
+<li>Not meant for query</li>
+</ul>
+<h2 id="labels"><a class="header" href="#labels">Labels</a></h2>
+<p>We can assign it with the imperative <code>label</code> command, or with
+<code>metadata.labels[]</code>.</p>
+<p>Not meant for elaborate. They have a max of 63 characters.</p>
+<p>We can add a label imperatively with:</p>
+<pre><code class="language-bash">k label pod nginx tier=backend env=prod app=viraccle
+</code></pre>
+<p>See pods with labels</p>
+<pre><code class="language-bash">k get pods --show-labels
+</code></pre>
+<p>To remove a label you put the key and a minus sign</p>
+<pre><code class="language-bash">k label pod nginx tier-
+</code></pre>
+<p>From a manifest.</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: label-demo
+  labels:
+    environment: production
+    app: nginx
+</code></pre>
+<p>We can use them to query stuff.</p>
+<pre><code class="language-bash">$ k get pods -l tier=frontend,env=dev --show-labels
+$ k get pods -l version --show-labels # only the key
+$ k get pods -l 'tier in (frontend,backend),env=dev' # create a query
+</code></pre>
+<p>There is other k8s objects that enforce policies or smth, and that can also use
+the labels to select to which pod you want to enforce them.  For example a
+<code>NetworkPolicy</code> can have <code>spec.podSelector.matchLabels.mylabel: frontend</code>.</p>
+<h2 id="annotation"><a class="header" href="#annotation">Annotation</a></h2>
+<p>Metadata without the ability to be queryable. Make sure to put the annotation
+in quotes, for handling spaces and stuff.</p>
+<p>A example could be the author, a commit hash, or a branch.</p>
+<pre><code class="language-bash">$ k annotate pod nginx  commit='866a8dc' branch='users/jloca/bug'
+</code></pre>
+<p>If we <code>describe</code> the object we will see our annotations there.</p>
+<p>There are some well-known annotations, <code>pod-security.kubernetes.io/warn: baseline</code>
+but that goes out of the scope of the course.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-application-deployment"><a class="header" href="#-application-deployment">🐦 Application Deployment</a></h1>
+<ol>
+<li><a href="./ckad_prep_9.html">Deployments</a></li>
+<li><a href="./ckad_prep_10.html">Helm</a></li>
+</ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="deployments"><a class="header" href="#deployments">Deployments</a></h1>
+<p>Managing a set of pods with the same config (called replicas) we want to make
+sure we have the same config for these replicas.</p>
+<p>We can scale up or down the number of replicas to fulfill our reqs. Updates to
+a replica config can be easily rolled out automatically.</p>
+<p>Under the hood, we say</p>
+<ul>
+<li><code>deployment</code>, "create 3 replicas"</li>
+<li><code>ReplicaSet</code>, "maintain stable set of 3 pods"</li>
+<li><code>pod</code>, "3 pods with the same definition"</li>
+</ul>
+<p>How do we create them imperatively:</p>
+<pre><code class="language-bash">k create deployment my-deploy --image=nginx --replicas=3
+</code></pre>
+<p>The default <code>--replicas</code> is 1</p>
+<p>The yaml would look like this:</p>
+<pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+</code></pre>
+<p>Everything under the <code>spec.template</code> is the same as the attributes for the pod
+spec.</p>
+<p>The deployment internally uses label selector <code>spec.selector.matchLabels</code>, it
+matches against <code>spec.template.metadata.labels</code>.</p>
+<h2 id="rolling-out-changes"><a class="header" href="#rolling-out-changes">Rolling out changes.</a></h2>
+<p>If you change the live object of the deployment, it will roll out the changes
+of the <code>replicasets</code> by themselves.</p>
+<p>It will keep a track of the changes, you can check it with:</p>
+<pre><code class="language-bash">$ k rollout history deployment my-deploy
+</code></pre>
+<p>If we make a change to the deployment, for example assign a new image.</p>
+<pre><code class="language-bas">k set image deployment my-deploy nginx=nginx:1.19.2
+</code></pre>
+<p>If you run the <code>k rollout history</code> command again, you will see the new
+deployment.</p>
+<p>If we want to come back to other versions, we can do</p>
+<pre><code class="language-bash">k rollout undo deployment my-deploy --to-revision=1
+</code></pre>
+<p>You can annotate what changed on each revision</p>
+<pre><code>k annotate deployment my-deploy kubernetes.io/change-cause="image updated to 1.17.1"
+</code></pre>
+<p>This will be displayed when listing the revisions.</p>
+<h2 id="manually-scaling-a-deployment"><a class="header" href="#manually-scaling-a-deployment">Manually Scaling a Deployment</a></h2>
+<pre><code class="language-bash">k scale deployment my-deploy --replicas=5
+</code></pre>
+<p>Or we can edit the live object of the deployment.</p>
+<h2 id="autoscaling-a-deployment"><a class="header" href="#autoscaling-a-deployment">Autoscaling a Deployment</a></h2>
+<p>The deployments scale automatically based on the metrics k8s is generating.</p>
+<p>There are a couple of types of autoscalers (which are k8s objects):</p>
+<ul>
+<li>Horizontal Pod Autoscaler (HPA): standard feature of k8s that scales the
+number of pod replicas based on cpu and memory thresholds.
+(Relevant for the exam)</li>
+<li>Vertical Pod Autoscaler (VPA): scales cpu and memory alloc for existing pods
+based on historic metrics. Supported by a cloud provider as an add-on.</li>
+</ul>
+<p>Both of them use the metrics server. You need to install the component, and set
+the resource requests and limits.</p>
+<pre><code class="language-yaml">apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: php-apache
+spec:
+  scaleTargetRef: # the scaling target
+    apiVersion: apps/v1
+    kind: Deployment
+    name: php-apache
+  minReplicas: 3
+  maxReplicas: 5
+  metrics:
+  - type: Resource # the thresholds
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+</code></pre>
+<p>You can see them with <code>k get hpa</code></p>
+<h2 id="deployment-strategies"><a class="header" href="#deployment-strategies">Deployment Strategies</a></h2>
+<ul>
+<li>
+<p>ramped: we will touch one replica at a time and update the config needed.</p>
+<ul>
+<li>pros: leads to no downtime. We roll out the new version to all the replicas
+overtime.</li>
+<li>cons: make sure we do not introduce breaking changes</li>
+</ul>
+</li>
+<li>
+<p>recreate: terminate the old version and then create a new one with the new
+config</p>
+<ul>
+<li>pros: good for dev envs, everything shutdowns at once and renewed at once</li>
+<li>cons: can cause downtime</li>
+</ul>
+</li>
+<li>
+<p>blue/green: creates a new deployment with the new version, they run along
+side each other, and once we are happy with the new one, we switch traffic.
+(you need to set up two different deployments)</p>
+<ul>
+<li>pros: no downtime, traffic can be routed when ready</li>
+<li>cons: resource duplication, config and network routing.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Special note on this one. When you have the two deployments, you'll need a
+svc that is the one that actually exposes the app, then you can just change
+the label selector there from blue to green (or viceversa) and k8s will do
+the rest for you</p>
+</blockquote>
+<ul>
+<li>canary: release a new version to a subset of users, then proceed to a full
+roll out (useful for testing) (you need to set up two different deployments)
+<ul>
+<li>pros: new version released to subset of users.</li>
+<li>cons: may require a load balancer for fine-grained dist</li>
+</ul>
+</li>
+</ul>
+<h3 id="how-do-we-implement-this"><a class="header" href="#how-do-we-implement-this">How do we implement this?</a></h3>
+<p><code>under spec.strategy.type</code> we define the type we want. We can configure it
+there</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="helm"><a class="header" href="#helm">Helm</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-application-observability--maintenance"><a class="header" href="#-application-observability--maintenance">🐤 Application Observability &amp; Maintenance</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="what-to-focus-on-each-topic"><a class="header" href="#what-to-focus-on-each-topic">What to focus on each topic.</a></h1>
@@ -1348,6 +1607,9 @@ spec:
 <li><a href="ckad_focus.html#pods-and-namespaces">Pods and Namespaces</a></li>
 <li><a href="ckad_focus.html#cronjob-and-jobs">Cronjob and jobs</a></li>
 <li><a href="ckad_focus.html#volumes">Volumes</a></li>
+<li><a href="ckad_focus.html#multi-container-pods">Multi-Container Pods</a></li>
+<li><a href="ckad_focus.html#labels-and-annotations">Labels and Annotations</a></li>
+<li><a href="ckad_focus.html#deployments">Deployments</a></li>
 </ul>
 <h2 id="containers"><a class="header" href="#containers">Containers</a></h2>
 <ul>
@@ -1382,6 +1644,28 @@ runtime behaviour.</li>
 <li>dynamic, automatically created the pv</li>
 </ul>
 </li>
+</ul>
+<h2 id="multi-container-pods-1"><a class="header" href="#multi-container-pods-1">Multi-Container Pods</a></h2>
+<ul>
+<li>The attributes that can be assigned to an <code>initContainers</code> section are the
+same as the containers section</li>
+<li>Design patterns (Sidecar, Ambassador, etc). When to use and how to implement.</li>
+</ul>
+<h2 id="labels-and-annotations-1"><a class="header" href="#labels-and-annotations-1">Labels and Annotations</a></h2>
+<ul>
+<li>Some primitives, Deployment, Service and Network Policy, use label selection
+heavily.</li>
+<li>Annotations are not made for querying, some reserved annotations may
+influence runtime behaviour.</li>
+</ul>
+<h2 id="deployments-1"><a class="header" href="#deployments-1">Deployments</a></h2>
+<ul>
+<li>When creating a deployment make sure label selection match with the pod
+template.</li>
+<li>Practice how to scale the number of replicas manually <code>--replicas</code> or via
+<code>hpa</code> for thresholds.</li>
+<li>be aware of the <code>k rollout undo</code>.</li>
+<li>know how to apply the deployment strategies.</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-k8s-up-and-running"><a class="header" href="#-k8s-up-and-running">🐋 k8s up and running</a></h1>
 <blockquote>
@@ -1991,7 +2275,7 @@ specific to each container.</p>
     persistentVolumeClaim:
       claimName: my-pvc
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="labels-and-annotations-1"><a class="header" href="#labels-and-annotations-1">Labels and Annotations</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="labels-and-annotations-2"><a class="header" href="#labels-and-annotations-2">Labels and Annotations</a></h1>
 <p>K8s apps can grow in size and complexity real quick. We can use <em>labels</em>
 and <em>annotations</em> to help organize our k8s objects/resources as sets of
 things that map how we think about the app. Making it a bit more human
@@ -2004,7 +2288,7 @@ obj/resource. You will be able to query based on this.</li>
 <li><strong>Annotations</strong>: set non-identifying information that libraries can leverage.
 These are not meant for querying</li>
 </ul>
-<h2 id="labels"><a class="header" href="#labels">Labels</a></h2>
+<h2 id="labels-1"><a class="header" href="#labels-1">Labels</a></h2>
 <p>Labels give identifying metadata for k8s objects. They are key/value pairs of
 strings.</p>
 <p>Keys are broken down into two parts</p>
@@ -2463,7 +2747,8 @@ O'Reilly</em></a>.</p>
 <blockquote>
 <p><em>using kind?</em></p>
 <p>in you mac? with podman?</p>
-<pre><code class="language-bash">podman machine start;
+<pre><code class="language-bash">podman machine init
+podman machine start;
 export KIND_EXPERIMENTAL_PROVIDER=podman;
 kind create cluster
 </code></pre>
@@ -2700,7 +2985,7 @@ spec:
                 name: configuration-data # name for the volume
                 key: title # key in the actual ConfigMap
 </code></pre>
-<h3 id="deployments-1"><a class="header" href="#deployments-1">Deployments</a></h3>
+<h3 id="deployments-2"><a class="header" href="#deployments-2">Deployments</a></h3>
 <p>Pretty cool stuff, but we might not just one to run one instance of our
 container, therefore we can use something called <code>Deployments</code>.</p>
 <p>A <code>Deployment</code> describe an application as a collection of identical pods,we can
