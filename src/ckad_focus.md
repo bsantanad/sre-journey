@@ -32,3 +32,10 @@
 - Go to the process of dynamic and static binding.
   - static, you need to create the pv
   - dynamic, automatically created the pv
+
+
+## Multi-Container Pods
+
+- The attributes that can be assigned to an `initContainers` section are the
+  same as the containers section
+- Design patterns (Sidecar, Ambassador, etc). When to use and how to implement.
