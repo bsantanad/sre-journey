@@ -173,7 +173,18 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="api-deprecations"><a class="header" href="#api-deprecations">Api Deprecations</a></h1>
+                        <h1 id="api-deprecations"><a class="header" href="#api-deprecations">API Deprecations</a></h1>
+<p>3 times a year k8s has a new release, this means that some of the APIs we are
+using might be deprecated. If this is the case, we will see a warning when
+doing the <code>kubectl</code> commands.</p>
+<p>If you need to migrate to new APIs, you can search for the deprecated API
+migration guide.</p>
+<p>You can see the available versions in your cluster using:</p>
+<pre><code class="language-bash">k api-versions
+</code></pre>
+<p>Be sure to check what other changes you need to do to adapt the k8s
+resources, sometimes you need to change something inside the manifest other
+than the version.</p>
 
                     </main>
 

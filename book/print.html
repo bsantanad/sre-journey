@@ -1600,11 +1600,167 @@ roll out (useful for testing) (you need to set up two different deployments)
 <p><code>under spec.strategy.type</code> we define the type we want. We can configure it
 there</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="helm"><a class="header" href="#helm">Helm</a></h1>
+<p>Helm is a package manager (similar to dnf or brew). The artifact produce by
+helm is a chart. The chart contains the info needed to create the cluster.</p>
+<p>They are stored in a repository. At runtime, it replaces placeholders in <code>yaml</code>
+templates files with the actual end-user defined values.</p>
+<h2 id="discovering-and-installing-a-public-helm-chart"><a class="header" href="#discovering-and-installing-a-public-helm-chart">Discovering and Installing a Public Helm Chart</a></h2>
+<p>You can go to <a href="artifacthub.io/packages">artifacthub.io/packages</a></p>
+<p>Search for a chart:</p>
+<pre><code class="language-bash">helm seach hub jenkins
+</code></pre>
+<p>We can add repos for helm to look into them:</p>
+<pre><code class="language-bash">helm repo add bitnami https://charts.bitname.com/bitnami
+helm repo update # this will give us the latest versions of the charts
+</code></pre>
+<p>Once we add the repo we can install the chart with</p>
+<pre><code class="language-bash">helm install jenkins bitnami/jenkins
+</code></pre>
+<h2 id="listing-installed-charts"><a class="header" href="#listing-installed-charts">Listing installed charts</a></h2>
+<pre><code class="language-bash">helm list
+</code></pre>
+<p>Then we can actually see the k8s objects/resources that were created by it.
+At any point we can choose to uninstall the charts.</p>
+<p>We can uninstall this at any time</p>
+<pre><code class="language-bash">helm uninstall jenkins
+</code></pre>
+<h2 id="building-and-installing-a-custom-helm-chart"><a class="header" href="#building-and-installing-a-custom-helm-chart">Building and Installing a Custom Helm Chart</a></h2>
+<p>This is not part of the exam, but good to know. We have a <code>Chart.yaml</code> and it
+has the meta info of the chart. Then we will have the <code>values.yaml</code> were we
+can define specific values that need to be change at runtime.</p>
+<p>We have another dir <code>templates</code> there we have all the manifests for the k8s
+objects/resources.</p>
+<p>You can just render the template <code>helm temlpate /path/to/the/chart/</code>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-application-observability--maintenance"><a class="header" href="#-application-observability--maintenance">🐤 Application Observability &amp; Maintenance</a></h1>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="api-deprecations"><a class="header" href="#api-deprecations">Api Deprecations</a></h1>
+<p>This covers topics every dev should know once their app is in production.</p>
+<ol>
+<li><a href="./ckad_prep_11.html">API Deprecations</a></li>
+<li><a href="./ckad_prep_12.html">Probes</a></li>
+<li><a href="./ckad_prep_13.html">Metrics Server</a></li>
+<li><a href="./ckad_prep_14.html">Troubleshooting Pods</a></li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="api-deprecations"><a class="header" href="#api-deprecations">API Deprecations</a></h1>
+<p>3 times a year k8s has a new release, this means that some of the APIs we are
+using might be deprecated. If this is the case, we will see a warning when
+doing the <code>kubectl</code> commands.</p>
+<p>If you need to migrate to new APIs, you can search for the deprecated API
+migration guide.</p>
+<p>You can see the available versions in your cluster using:</p>
+<pre><code class="language-bash">k api-versions
+</code></pre>
+<p>Be sure to check what other changes you need to do to adapt the k8s
+resources, sometimes you need to change something inside the manifest other
+than the version.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="probes"><a class="header" href="#probes">Probes</a></h1>
+<p>It helps with detecting and correcting application issues.</p>
+<p>The probes will run a <em>miniprocess</em> that check for runtime conditions. For
+example, an http get request. For other apps open a tcp socket, or stuff
+similar like that.</p>
+<p>The verification method is exec by <code>kubelet</code>.</p>
+<h2 id="readiness-probe"><a class="header" href="#readiness-probe">Readiness Probe</a></h2>
+<p><em>Is the app ready to server requests?</em></p>
+<p>This checks if the app is up and running, the kubelet will check the config
+of the readiness probe periodically.</p>
+<h2 id="liveness-probe"><a class="header" href="#liveness-probe">Liveness Probe</a></h2>
+<p><em>Does the app still function without errors?</em></p>
+<p>Check for deadlocks, memoryleaks. This will restart the container and try to
+get the app into a running state</p>
+<h2 id="startup-probe"><a class="header" href="#startup-probe">Startup Probe</a></h2>
+<p>Legacy app may need longer to start. Hold off on starting the liveness
+probe.</p>
+<h2 id="health-verification-methods"><a class="header" href="#health-verification-methods">Health Verification Methods</a></h2>
+<p>We can choose from different verification methods, in any type of probe</p>
+<ul>
+<li>custom command: <code>exec.command</code>, execute a command inside the container and
+check the exit code</li>
+<li>http get request: <code>httpGet</code>, make a request and check if it is between
+200-399</li>
+<li><code>tcp</code> socket connection: <code>tcpSocket</code>, open socket at port</li>
+<li><code>gRPC</code>:  <code>grpc</code></li>
+</ul>
+<p>You can customize each of these a bit more.</p>
+<ul>
+<li><code>initalDelaySeconds</code></li>
+<li><code>periodSeconds</code></li>
+<li><code>timeoutSeconds</code></li>
+<li><code>successThreshold</code> - number of successful attempts until probe is consider
+successful after a failure <code>failureThreshold</code>.</li>
+<li><code>terminationGracePeriodSeconds</code> - grace period before forcing a container
+stop upon failure.</li>
+</ul>
+<p>Probes are not different objects. You need to add the config inside the
+container:</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: liveness-http
+spec:
+  containers:
+  - name: liveness
+    image: registry.k8s.io/e2e-test-images/agnhost:2.40
+    args:
+    - liveness # here we start
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 8080
+      initialDelaySeconds: 3
+      periodSeconds: 3
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="metrics-server"><a class="header" href="#metrics-server">Metrics Server</a></h1>
+<p>The metric server is component you have to install in a k8s cluster to retrieve
+metrics.</p>
+<p>It works by the <code>kubelet</code>s sending information (<code>cpu</code>, <code>memory consuption</code>) to the
+centralized server.</p>
+<p>To install the metrics server, you can <code>k apply</code> the manifest:</p>
+<pre><code class="language-bash">kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+</code></pre>
+<p>Once it is installed you can do</p>
+<pre><code>$ k top nodes # show metrics on nodes
+$ k top pods # show metrics on nodes
+</code></pre>
+<p>For the Horizontal Pod Autoscaler (HPA) you need to have this installed in your
+cluster. Pod scheduling on clusters also sometimes need the metrics server
+installed. For example, when assigning cpu, memory limits.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="troubleshooting-pods-and-containers"><a class="header" href="#troubleshooting-pods-and-containers">Troubleshooting Pods and Containers</a></h1>
+<p>How to identify root cause of failures.</p>
+<h2 id="when-create-a-new-pod-object"><a class="header" href="#when-create-a-new-pod-object">When create a new pod object</a></h2>
+<ul>
+<li><code>ImagePullBackOff</code> or <code>ErrImagePull</code>: image could not be pulled from the
+registry.
+<ul>
+<li>Verify image name</li>
+<li>Verify image exists</li>
+<li>Verify network access from node to registry</li>
+<li>Ensure auth is set properly</li>
+</ul>
+</li>
+<li><code>CrashLoopBackOff</code>: app or command run in container and crashes
+<ul>
+<li>Check the command is executed properly</li>
+</ul>
+</li>
+<li><code>CreateContainerConfigError</code>:  <code>configmap</code> or <code>secret</code> by container cannot be
+found
+<ul>
+<li>check correct name of the config obj</li>
+<li>verify the existence of the config obj in the namespace</li>
+</ul>
+</li>
+</ul>
+<h2 id="inspecting-events-of-a-specific-pod"><a class="header" href="#inspecting-events-of-a-specific-pod">Inspecting Events of a Specific Pod</a></h2>
+<pre><code class="language-bash">k get events
+</code></pre>
+<p>Will list the events across the pods. You can also check the logs of the pod.
+Go inside the pod with <code>k exec -it</code>.</p>
+<p>To debug a container that does not expose a shell. We can use:</p>
+<pre><code>k debug mypod -it --image=busybox
+</code></pre>
+<p>this will create an interactive debugging session in pod <code>mypod</code> and
+immediately attach to it.</p>
+<p>You can also do <code>k cp &lt;namespace&gt;/&lt;pod&gt;:&lt;file&gt; &lt;local path&gt;</code> to copy files</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-application-observability--maintenance-1"><a class="header" href="#-application-observability--maintenance-1">🦉 Application Observability &amp; Maintenance</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="custom-resource-definition-crds"><a class="header" href="#custom-resource-definition-crds">Custom Resource Definition (crds)</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="authentication-and-authorization"><a class="header" href="#authentication-and-authorization">Authentication and Authorization</a></h1>
@@ -1624,6 +1780,11 @@ there</p>
 <li><a href="ckad_focus.html#multi-container-pods">Multi-Container Pods</a></li>
 <li><a href="ckad_focus.html#labels-and-annotations">Labels and Annotations</a></li>
 <li><a href="ckad_focus.html#deployments">Deployments</a></li>
+<li><a href="ckad_focus.html#helm">Helm</a></li>
+<li><a href="ckad_focus.html#api-deprecations">API Deprecations</a></li>
+<li><a href="ckad_focus.html#probes">Probes</a></li>
+<li><a href="ckad_focus.html#metrics-server">Metrics Server</a></li>
+<li><a href="ckad_focus.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 <h2 id="containers"><a class="header" href="#containers">Containers</a></h2>
 <ul>
@@ -1680,6 +1841,34 @@ template.</li>
 <code>hpa</code> for thresholds.</li>
 <li>be aware of the <code>k rollout undo</code>.</li>
 <li>know how to apply the deployment strategies.</li>
+</ul>
+<h2 id="helm-1"><a class="header" href="#helm-1">Helm</a></h2>
+<ul>
+<li>Just know that helm is an open source tool for installing a set of <code>yaml</code>
+manifests.</li>
+<li>Practice discovering and installing existing charts, using the helm
+executable.</li>
+</ul>
+<h2 id="api-deprecations-1"><a class="header" href="#api-deprecations-1">API Deprecations</a></h2>
+<ul>
+<li><code>kubectl</code> will show a message if an api will be deprecated</li>
+<li>Check the migration guide</li>
+</ul>
+<h2 id="probes-1"><a class="header" href="#probes-1">Probes</a></h2>
+<ul>
+<li>Understand the purpose of readiness, startup and liveness probes.</li>
+<li>Easy to just copy-paste the k8s docs</li>
+<li>Try to induce failure conditions to see the runtime effects</li>
+</ul>
+<h2 id="metrics-server-1"><a class="header" href="#metrics-server-1">Metrics Server</a></h2>
+<ul>
+<li>You wont have to install the metric server</li>
+<li>Understand the purpose of the metric server, and which other objects use it.</li>
+</ul>
+<h2 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h2>
+<ul>
+<li>practice relevant <code>k</code> command to diagnose issues.</li>
+<li>proactively expose yourself to failing pods</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-k8s-up-and-running"><a class="header" href="#-k8s-up-and-running">🐋 k8s up and running</a></h1>
 <blockquote>

@@ -174,6 +174,63 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="probes"><a class="header" href="#probes">Probes</a></h1>
+<p>It helps with detecting and correcting application issues.</p>
+<p>The probes will run a <em>miniprocess</em> that check for runtime conditions. For
+example, an http get request. For other apps open a tcp socket, or stuff
+similar like that.</p>
+<p>The verification method is exec by <code>kubelet</code>.</p>
+<h2 id="readiness-probe"><a class="header" href="#readiness-probe">Readiness Probe</a></h2>
+<p><em>Is the app ready to server requests?</em></p>
+<p>This checks if the app is up and running, the kubelet will check the config
+of the readiness probe periodically.</p>
+<h2 id="liveness-probe"><a class="header" href="#liveness-probe">Liveness Probe</a></h2>
+<p><em>Does the app still function without errors?</em></p>
+<p>Check for deadlocks, memoryleaks. This will restart the container and try to
+get the app into a running state</p>
+<h2 id="startup-probe"><a class="header" href="#startup-probe">Startup Probe</a></h2>
+<p>Legacy app may need longer to start. Hold off on starting the liveness
+probe.</p>
+<h2 id="health-verification-methods"><a class="header" href="#health-verification-methods">Health Verification Methods</a></h2>
+<p>We can choose from different verification methods, in any type of probe</p>
+<ul>
+<li>custom command: <code>exec.command</code>, execute a command inside the container and
+check the exit code</li>
+<li>http get request: <code>httpGet</code>, make a request and check if it is between
+200-399</li>
+<li><code>tcp</code> socket connection: <code>tcpSocket</code>, open socket at port</li>
+<li><code>gRPC</code>:  <code>grpc</code></li>
+</ul>
+<p>You can customize each of these a bit more.</p>
+<ul>
+<li><code>initalDelaySeconds</code></li>
+<li><code>periodSeconds</code></li>
+<li><code>timeoutSeconds</code></li>
+<li><code>successThreshold</code> - number of successful attempts until probe is consider
+successful after a failure <code>failureThreshold</code>.</li>
+<li><code>terminationGracePeriodSeconds</code> - grace period before forcing a container
+stop upon failure.</li>
+</ul>
+<p>Probes are not different objects. You need to add the config inside the
+container:</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: liveness-http
+spec:
+  containers:
+  - name: liveness
+    image: registry.k8s.io/e2e-test-images/agnhost:2.40
+    args:
+    - liveness # here we start
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 8080
+      initialDelaySeconds: 3
+      periodSeconds: 3
+</code></pre>
 
                     </main>
 
