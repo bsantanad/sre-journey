@@ -1762,8 +1762,224 @@ Go inside the pod with <code>k exec -it</code>.</p>
 immediately attach to it.</p>
 <p>You can also do <code>k cp &lt;namespace&gt;/&lt;pod&gt;:&lt;file&gt; &lt;local path&gt;</code> to copy files</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-application-observability--maintenance-1"><a class="header" href="#-application-observability--maintenance-1">🦉 Application Observability &amp; Maintenance</a></h1>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="custom-resource-definition-crds"><a class="header" href="#custom-resource-definition-crds">Custom Resource Definition (crds)</a></h1>
+<p>This module account for the most points on the exam.</p>
+<ol>
+<li><a href="ckad_prep_15.html">CRDs</a></li>
+<li><a href="ckad_prep_16.html">Role-Based Access Control</a></li>
+<li><a href="ckad_prep_17.html">Pod Resources and Security Configuration</a></li>
+<li><a href="ckad_prep_18.html">Configuration Data</a></li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="custom-resource-definition-crds"><a class="header" href="#custom-resource-definition-crds">Custom Resource Definition (CRDs)</a></h1>
+<p>These are custom primitives we can introduce by extending the k8s api.</p>
+<p>We can interact with an object that we can define, create and persist, and we
+the k8s api will expose it.</p>
+<p>You need to create a <code>controller</code> to make them useful. This implements the
+logic   between your custom object and the k8s api. This combination is called
+<em>Operator pattern</em>.</p>
+<p>The actual controller are written in Go or Python.</p>
+<h2 id="example-crd"><a class="header" href="#example-crd">Example CRD</a></h2>
+<ul>
+<li>
+<p>Requirement: a web app stack deployed via a Deployment with one or more
+replicas. There is a Service object that routes network traffic to the pods.</p>
+</li>
+<li>
+<p>Desired Functionality: After the deployment happened, we want to run a quick
+smoke test against Service's DNS names, to see everything is okay. The result
+of the test will be send to an external service for rendering a UI.</p>
+</li>
+<li>
+<p>Goal: Implement the Operator pattern (CRD and controller)</p>
+</li>
+</ul>
+<pre><code class="language-yaml">apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: &lt;plural&gt;.&lt;group&gt;
+  name: crontabs.stable.example.com
+spec:
+  # group name to use for REST API: /apis/&lt;group&gt;/&lt;version&gt;
+  group: stable.example.com
+  # list of versions supported by this CustomResourceDefinition
+  versions:
+    - name: v1
+      # Each version can be enabled/disabled by Served flag.
+      served: true
+      # One and only one version must be marked as the storage version.
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                cronSpec:
+                  type: string
+                image:
+                  type: string
+                replicas:
+                  type: integer
+  # either Namespaced or Cluster
+  scope: Namespaced
+  names:
+    # plural name to be used in the URL: /apis/&lt;group&gt;/&lt;version&gt;/&lt;plural&gt;
+    plural: crontabs
+    # singular name to be used as an alias on the CLI and for display
+    singular: crontab
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: CronTab
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - ct
+</code></pre>
+<h2 id="useful-tips"><a class="header" href="#useful-tips">Useful tips</a></h2>
+<p>Once you create it, you can see it if you list the api-resources</p>
+<pre><code>k api-resources
+</code></pre>
+<p>Then when you create an object you can list it with the <code>spec.names.singular</code>
+or <code>spec.names.plural</code> you defined in the CRD's manifest. So if the name was
+<code>my-custom-obj</code> you could do:</p>
+<pre><code>k get my-custom-obj
+</code></pre>
+<p>One last thing, to know what is the version you should put in the object manifest you can do.</p>
+<pre><code>k api-resources | grep my-custom-obj
+</code></pre>
+<p>And it will list it there in the second column.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="authentication-and-authorization"><a class="header" href="#authentication-and-authorization">Authentication and Authorization</a></h1>
+<p>Access control for the k8s api.</p>
+<p><img src="img/auth-k8s.png" alt="auth-k8s.png" /></p>
+<p>This process has 4 steps.</p>
+<ol>
+<li>Authentication: checks that the identity of the client is valid.</li>
+<li>Authorization: okay, your identity is good, but do you have access to what
+are trying to do? (Here it comes into place RBAC, read below for more info)</li>
+<li>Admission Control: you have access alright, did you send the request in a
+well-formed manner?</li>
+<li>Validation: checks that the resource included in the request is valid.</li>
+</ol>
+<ul>
+<li><a href="ckad_prep_16.html#authentication-via-credentials-in-kubeconfig">Authentication via credentials in kubeconfig</a></li>
+<li><a href="ckad_prep_16.html#role-based-access-control-rbac">Role-based Access Control (RBAC)</a></li>
+<li><a href="ckad_prep_16.html#using-a-serviceaccount-with-rbac">Using a ServiceAccount with RBAC</a>
+<ul>
+<li><a href="ckad_prep_16.html#how-do-you-assign-it-to-a-pod">How do you assign it to a pod?</a></li>
+<li><a href="ckad_prep_16.html#how-do-you-retrieve-it-for-an-external-service">How do you retrieve it for an external service?</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="authentication-via-credentials-in-kubeconfig"><a class="header" href="#authentication-via-credentials-in-kubeconfig">Authentication via credentials in kubeconfig</a></h2>
+<p>Some useful commands:</p>
+<pre><code>k config view # renders the contents of the kubeconfig file
+k config current-context # shows the currently-selected context
+k config user-context johndoe # switch context
+</code></pre>
+<p>Inside <code>.kube/config</code> we can see a yaml</p>
+<ul>
+<li><code>clusters.cluster.server</code>: api server endpoint for connecting with a cluster.</li>
+<li><code>contexts.context</code>: groups access params
+<ul>
+<li><code>contexts.context.cluster</code>: name of the cluster</li>
+<li><code>contexts.context.user</code>: user name</li>
+</ul>
+</li>
+<li><code>contexts.name</code>: name of the context</li>
+</ul>
+<p>Here is an example of a <code>kind</code> cluster.</p>
+<pre><code class="language-yaml">apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: &lt;token&gt;
+    server: https://127.0.0.1:51224
+  name: kind-kind-cluster
+contexts:
+- context:
+    cluster: kind-kind-cluster
+    user: kind-kind-user
+  name: kind-kind
+current-context: kind-kind
+kind: Config
+preferences: {}
+users:
+- name: kind-kind-user
+  user:
+    client-certificate-data: &lt;cert&gt;
+    client-key-data: &lt;cert&gt;
+</code></pre>
+<h2 id="role-based-access-control-rbac"><a class="header" href="#role-based-access-control-rbac">Role-based Access Control (RBAC)</a></h2>
+<p>RBAC works after the authentication process. Now that we know the
+credentials are valid we have to ask. Does this user have permission to do
+this?</p>
+<p>RBAC defines policies for users, groups and processes, that allow or
+disallow access to k8s objects. For exmaple there can be a group that can
+only list and create pods, but not touch <code>secrets</code> or <code>configmaps</code>.</p>
+<p>Enabling RBAC is a most for any org.</p>
+<p>High level breakdown.</p>
+<ol>
+<li>Subject</li>
+</ol>
+<ul>
+<li>groups</li>
+<li>users</li>
+<li>service accounts</li>
+</ul>
+<ol start="2">
+<li>API resources</li>
+</ol>
+<ul>
+<li>configmap</li>
+<li>pod</li>
+<li>deployment</li>
+</ul>
+<ol start="3">
+<li>Operations</li>
+</ol>
+<ul>
+<li>create</li>
+<li>list</li>
+<li>watch</li>
+<li>delete</li>
+</ul>
+<p>There are 2 k8s resources/objects we care about.</p>
+<ul>
+<li><code>roles</code>: define the role</li>
+<li><code>rolebining</code>: attach the role to a user.</li>
+</ul>
+<p>This are namespace scoped. If you want to do this but in all the cluster
+then we have <code>cluster</code> and <code>clusterolebinding</code>.</p>
+<p>In this case, creating the resources with the imperative command is easy:</p>
+<pre><code class="language-yaml">k create role read-only --verb=list,get,watch --resource=pods,deployment,services
+</code></pre>
+<p>Then to bind it:</p>
+<pre><code class="language-yaml">k create rolebinding read-only-binding --role=read-only --user=johndoe
+</code></pre>
+<p>Of course we can describe, get, and any other operation you can do to any
+other k8s resource/obj.</p>
+<h2 id="using-a-serviceaccount-with-rbac"><a class="header" href="#using-a-serviceaccount-with-rbac">Using a ServiceAccount with RBAC</a></h2>
+<p>A service account is a non-human account that interacts with the kubernetes
+cluster.</p>
+<p>Entities outside or inside the cluster (pods, system components, etc) can
+use specific credentials to identify as ServiceAccount's.</p>
+<p>How to use the service accounts.</p>
+<ul>
+<li>Create a <code>serviceaccount</code> object</li>
+<li>Grant permissions to the ServiceAccount object using RBAC</li>
+<li>Assign the ServiceAccount object to a pod during its creation or retrieve
+the SerivceAccount token and use if from an external service.</li>
+</ul>
+<h3 id="how-do-you-assign-it-to-a-pod"><a class="header" href="#how-do-you-assign-it-to-a-pod">How do you assign it to a pod?</a></h3>
+<p>Under <code>spec.serviceAccountName</code> you add the name of the service account name.</p>
+<h3 id="how-do-you-retrieve-it-for-an-external-service"><a class="header" href="#how-do-you-retrieve-it-for-an-external-service">How do you retrieve it for an external service?</a></h3>
+<pre><code>k describe pod list-pods -n k97
+</code></pre>
+<pre><code>k exec -it list-pods -n k97 -- /bin/sh
+# cat /var/run/secrets/kubernetes.io/serviceaccount/token
+eyJShAthetoken...
+</code></pre>
+<blockquote>
+<p>Note. To get the API server endpoint from within the cluster you can do
+<code>k get service kuberentes</code>.</p>
+</blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="resource-management"><a class="header" href="#resource-management">Resource Management</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="configmaps-and-secrets"><a class="header" href="#configmaps-and-secrets">Configmaps and Secrets</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="security-context"><a class="header" href="#security-context">Security Context</a></h1>
@@ -1785,6 +2001,8 @@ immediately attach to it.</p>
 <li><a href="ckad_focus.html#probes">Probes</a></li>
 <li><a href="ckad_focus.html#metrics-server">Metrics Server</a></li>
 <li><a href="ckad_focus.html#troubleshooting">Troubleshooting</a></li>
+<li><a href="ckad_focus.html#crds">CRDs</a></li>
+<li><a href="ckad_focus.html#authentication-and-authorization">Authentication and Authorization</a></li>
 </ul>
 <h2 id="containers"><a class="header" href="#containers">Containers</a></h2>
 <ul>
@@ -1869,6 +2087,25 @@ executable.</li>
 <ul>
 <li>practice relevant <code>k</code> command to diagnose issues.</li>
 <li>proactively expose yourself to failing pods</li>
+</ul>
+<h2 id="crds"><a class="header" href="#crds">CRDs</a></h2>
+<ul>
+<li>You are not expected to implement a CRD schema.</li>
+<li>You only need to know how to discover them and use them.</li>
+<li>To study, you can install an open source CRD
+<ul>
+<li>for example the <a href="https://external-secrets.io/latest/introduction/overview/">external secrets</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="authentication-and-authorization-1"><a class="header" href="#authentication-and-authorization-1">Authentication and Authorization</a></h2>
+<ul>
+<li>RBAC defines permissions for permitted operations on specific API resources</li>
+<li>Role and RoleBinding define permissions for objects in a namespace.</li>
+<li>ClusterRole and ClusterRoleBinding define permissions for objects across
+all namespaces.</li>
+<li>We can use the ServiceAccount object to run services against the k8s
+cluster itself. It will auth with RBAC also.</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-k8s-up-and-running"><a class="header" href="#-k8s-up-and-running">🐋 k8s up and running</a></h1>
 <blockquote>

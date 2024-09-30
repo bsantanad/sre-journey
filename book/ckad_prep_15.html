@@ -173,7 +173,83 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="custom-resource-definition-crds"><a class="header" href="#custom-resource-definition-crds">Custom Resource Definition (crds)</a></h1>
+                        <h1 id="custom-resource-definition-crds"><a class="header" href="#custom-resource-definition-crds">Custom Resource Definition (CRDs)</a></h1>
+<p>These are custom primitives we can introduce by extending the k8s api.</p>
+<p>We can interact with an object that we can define, create and persist, and we
+the k8s api will expose it.</p>
+<p>You need to create a <code>controller</code> to make them useful. This implements the
+logic   between your custom object and the k8s api. This combination is called
+<em>Operator pattern</em>.</p>
+<p>The actual controller are written in Go or Python.</p>
+<h2 id="example-crd"><a class="header" href="#example-crd">Example CRD</a></h2>
+<ul>
+<li>
+<p>Requirement: a web app stack deployed via a Deployment with one or more
+replicas. There is a Service object that routes network traffic to the pods.</p>
+</li>
+<li>
+<p>Desired Functionality: After the deployment happened, we want to run a quick
+smoke test against Service's DNS names, to see everything is okay. The result
+of the test will be send to an external service for rendering a UI.</p>
+</li>
+<li>
+<p>Goal: Implement the Operator pattern (CRD and controller)</p>
+</li>
+</ul>
+<pre><code class="language-yaml">apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: &lt;plural&gt;.&lt;group&gt;
+  name: crontabs.stable.example.com
+spec:
+  # group name to use for REST API: /apis/&lt;group&gt;/&lt;version&gt;
+  group: stable.example.com
+  # list of versions supported by this CustomResourceDefinition
+  versions:
+    - name: v1
+      # Each version can be enabled/disabled by Served flag.
+      served: true
+      # One and only one version must be marked as the storage version.
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                cronSpec:
+                  type: string
+                image:
+                  type: string
+                replicas:
+                  type: integer
+  # either Namespaced or Cluster
+  scope: Namespaced
+  names:
+    # plural name to be used in the URL: /apis/&lt;group&gt;/&lt;version&gt;/&lt;plural&gt;
+    plural: crontabs
+    # singular name to be used as an alias on the CLI and for display
+    singular: crontab
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: CronTab
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - ct
+</code></pre>
+<h2 id="useful-tips"><a class="header" href="#useful-tips">Useful tips</a></h2>
+<p>Once you create it, you can see it if you list the api-resources</p>
+<pre><code>k api-resources
+</code></pre>
+<p>Then when you create an object you can list it with the <code>spec.names.singular</code>
+or <code>spec.names.plural</code> you defined in the CRD's manifest. So if the name was
+<code>my-custom-obj</code> you could do:</p>
+<pre><code>k get my-custom-obj
+</code></pre>
+<p>One last thing, to know what is the version you should put in the object manifest you can do.</p>
+<pre><code>k api-resources | grep my-custom-obj
+</code></pre>
+<p>And it will list it there in the second column.</p>
 
                     </main>
 
