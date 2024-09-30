@@ -83,3 +83,19 @@
 
 - practice relevant `k` command to diagnose issues.
 - proactively expose yourself to failing pods
+
+## CRDs
+
+- You are not expected to implement a CRD schema.
+- You only need to know how to discover them and use them.
+- To study, you can install an open source CRD
+  - for example the [external secrets](https://external-secrets.io/latest/introduction/overview/)
+
+## Authentication and Authorization
+
+- RBAC defines permissions for permitted operations on specific API resources
+- Role and RoleBinding define permissions for objects in a namespace.
+- ClusterRole and ClusterRoleBinding define permissions for objects across
+  all namespaces.
+- We can use the ServiceAccount object to run services against the k8s
+  cluster itself. It will auth with RBAC also.
