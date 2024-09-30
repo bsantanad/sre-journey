@@ -55,3 +55,31 @@
   `hpa` for thresholds.
 - be aware of the `k rollout undo`.
 - know how to apply the deployment strategies.
+
+## Helm
+
+- Just know that helm is an open source tool for installing a set of `yaml`
+  manifests.
+- Practice discovering and installing existing charts, using the helm
+  executable.
+
+## API Deprecations
+
+- `kubectl` will show a message if an api will be deprecated
+- Check the migration guide
+
+## Probes
+
+- Understand the purpose of readiness, startup and liveness probes.
+- Easy to just copy-paste the k8s docs
+- Try to induce failure conditions to see the runtime effects
+
+## Metrics Server
+
+- You wont have to install the metric server
+- Understand the purpose of the metric server, and which other objects use it.
+
+## Troubleshooting
+
+- practice relevant `k` command to diagnose issues.
+- proactively expose yourself to failing pods
