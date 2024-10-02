@@ -99,3 +99,25 @@
   all namespaces.
 - We can use the ServiceAccount object to run services against the k8s
   cluster itself. It will auth with RBAC also.
+
+## Resource Management
+
+- 3 aspects,
+  - how to define min and max resources for a container.
+  - resource quota to limit the aggregate resource consumption or limit the
+    overall objects created in a namespace
+  - limit range, constrains of defaults the resources alloc for an specific
+    object type.
+
+## ConfigMaps and Secrets
+
+- Understand the purpose for a configmap against a secret
+- Secrets are meant to represent sensitive data. They are not encrypted
+- How to define those configmaps and secret objects. How to interact with them.
+
+## Security Context
+
+- The security context lest you provide privilege and access control to
+  containers.
+- You can define it to the whole pod or to individual containers.
+- Know where to find the security attributes. (k8s docs)
