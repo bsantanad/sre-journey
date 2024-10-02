@@ -174,6 +174,84 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="configmaps-and-secrets"><a class="header" href="#configmaps-and-secrets">Configmaps and Secrets</a></h1>
+<p>K8s primitives for configuration data that we can inject into a pod.</p>
+<p>They have some characteristics:</p>
+<ul>
+<li>stores as key pair values.</li>
+<li>stored decoupled from consuming pod</li>
+<li>configmap: plain text values for config apps, flags, URLs, etc.</li>
+<li>secret: Base64-enconded values, for API keys or SSL certificates. The values
+are not encrypted.</li>
+<li>they are stored in <code>etcd</code> unencrypted, but you can encrypt them if you want.</li>
+</ul>
+<p>Once we create the object we can mount is as a volume or as env variables.</p>
+<h2 id="imperative-approach"><a class="header" href="#imperative-approach">Imperative Approach</a></h2>
+<pre><code class="language-bash">k create configmap db-config --from-literal=db=staging
+</code></pre>
+<p>you have multiple options:</p>
+<pre><code class="language-bash">--from-env-file=config.env
+--from-file=app-config.json
+--from-file=some-dir # a dir
+</code></pre>
+<p>Once you create it, you can  mount it in a pod like this:</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: env-configmap
+spec:
+  containers:
+    - name: app
+      command: ["/bin/sh", "-c", "printenv"]
+      image: busybox:latest
+      envFrom:
+        - configMapRef:
+            name: myconfigmap
+</code></pre>
+<p>You can also get specific keys from a configmap using <code>configMapKeyRef</code></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: env-configmap
+spec:
+  containers:
+    - name: app
+      command: ["/bin/sh", "-c", "printenv"]
+      image: busybox:latest
+      env:
+      - name: DATABASE_URL
+        valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: database_url
+</code></pre>
+<p>In this example we are using the key <code>database_url</code> from the config map
+<code>backend-config</code> and setting it in the env as <code>DATABASE_URL</code> in caps.</p>
+<h2 id="consuming-changed-configmap-data"><a class="header" href="#consuming-changed-configmap-data">Consuming Changed ConfigMap Data</a></h2>
+<p>Containers will not refresh data upon a change. You would have to develop that
+on your app, like refresh the env variables periodically or on-demand.</p>
+<h2 id="secrets"><a class="header" href="#secrets">Secrets</a></h2>
+<p>There are these secrets:</p>
+<ul>
+<li><code>generic</code>, creates a secret from a file, directory or literal value</li>
+<li><code>docker-registry</code>, creates a secret for a docker registry</li>
+<li><code>tls</code>, creates a tls secret</li>
+</ul>
+<p>Imperative commands</p>
+<pre><code>k create secret generic db-creds --from-literal=pwd=s3cre
+</code></pre>
+<p>Also we have specialized secret types, they are set using the <code>--type</code>
+attribute in manifest.</p>
+<ul>
+<li><code>kubernets.io/basic-auth</code>, credentials for basic auth</li>
+<li><code>kubernets.io/ssh-auth</code>, credentials for ssh</li>
+<li><code>kubernets.io/service-account-token</code>, serviceaccount token</li>
+<li><code>kubernets.io/token</code>, node bootstrap token data</li>
+</ul>
+<p>If you create a secret yaml by hand you need to encode the value yourself.</p>
+<pre><code class="language-bash">echo -n 's3cre!' | base64
+</code></pre>
+<p>If you don not want to do that you can also provide the data <code>stringData</code> in
+the <code>yaml</code>, and k will encrypt it once you <code>k apply</code> it.</p>
 
                     </main>
 

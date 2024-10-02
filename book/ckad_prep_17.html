@@ -174,6 +174,99 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="resource-management"><a class="header" href="#resource-management">Resource Management</a></h1>
+<p>Resource requests and limits, resource quotas and limit range.</p>
+<p>Here we will cover:</p>
+<ul>
+<li>
+<p>Define min and max resources needed to run a container. We just need to
+modify the definition of a pod.</p>
+</li>
+<li>
+<p><code>ResourceQouta</code> constrain resources on a namespace-level.</p>
+</li>
+<li>
+<p><code>LimitRange</code> constrains resource alloc for a single object</p>
+</li>
+</ul>
+<h2 id="resource-units-in-k8s"><a class="header" href="#resource-units-in-k8s">Resource Units in K8s</a></h2>
+<p>K8s measures: CPU in millicores and memory resource in bytes.</p>
+<p>1 CPU unit is equivalent to 1 physical CPU core, or 1 virtual core, depending
+on whether the node is a physical host or a virtual machine running inside a
+physical machine.</p>
+<h2 id="container-resource-request-min"><a class="header" href="#container-resource-request-min">Container Resource Request (min)</a></h2>
+<p>You can define the min amount of resources needed to run an app via
+<code>spec.containers[].resources.requests</code></p>
+<p>These resources include: cpu, memory, huge page, ephemeral storage</p>
+<p>This limits influence if the pod can be scheduled or not, you might see these
+messages: <code>PodExceedsFreeCPU</code> or <code>PodExceedsFreeMemory</code>.</p>
+<p>The options available are:</p>
+<ul>
+<li><code>spec.containers[].resources.requests</code>
+<ul>
+<li><code>cpu</code>: eg 500m</li>
+<li><code>memory</code>: eg 64Mi</li>
+<li><code>hugepages-&lt;size&gt;</code>: eg 60Mi</li>
+<li><code>ephemeral-storage</code>: eg 4Gi</li>
+</ul>
+</li>
+</ul>
+<h2 id="container-resource-limits-max"><a class="header" href="#container-resource-limits-max">Container Resource Limits (max)</a></h2>
+<p>Can be defined in <code>spec.containers[].resources.limits</code></p>
+<p>These resources include: cpu, memory, huge page, ephemeral storage</p>
+<p>Container runtime decides how to handle situation where app exceeds alloc
+capacity. (Maybe kill the container)</p>
+<ul>
+<li><code>spec.containers[].resources.limits</code>
+<ul>
+<li><code>cpu</code>: eg 500m</li>
+<li><code>memory</code>: eg 64Mi</li>
+<li><code>hugepages-&lt;size&gt;</code>: eg 60Mi</li>
+<li><code>ephemeral-storage</code>: eg 4Gi</li>
+</ul>
+</li>
+</ul>
+<h2 id="resourcequota"><a class="header" href="#resourcequota">ResourceQuota</a></h2>
+<p>This is a k8s primitive, it defines resources constrains for an specific
+namespace. This is usually done by the admin.</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: my-quota
+  namespace: this-ns
+spec:
+  hard:
+    pods: "2"
+    requests.cpu: "2"
+    requests.memory: 1024Mi
+    limits.cpu: 4
+    limits.memory: 4096Mi
+</code></pre>
+<p>If the there is a resource quota, then all the resources it covers must define
+<code>limits</code> and <code>requests</code> so the resource quota can do the math. It wont allow us
+to create the objs otherwise.</p>
+<h2 id="limitrange"><a class="header" href="#limitrange">LimitRange</a></h2>
+<p>So basically <code>resourcequota</code> is for namespaces, but you can micro manage it
+more with limit ranges you can specify for each object within a namespaces the
+resource allocation.</p>
+<p>You can apply default values that will be set if no explicit declaration is set
+in the specific object manifest. As well as global min and max.</p>
+<p>For example this will</p>
+<pre><code>apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-resource-constraint
+spec:
+  limits:
+  - default: # this section defines default limits
+      cpu: 500m
+    defaultRequest: # this section defines default requests
+      cpu: 500m
+    max: # max and min define the limit range
+      cpu: "1"
+    min:
+      cpu: 100m
+    type: Container
+</code></pre>
 
                     </main>
 

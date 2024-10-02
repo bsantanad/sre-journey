@@ -1981,8 +1981,221 @@ eyJShAthetoken...
 <code>k get service kuberentes</code>.</p>
 </blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="resource-management"><a class="header" href="#resource-management">Resource Management</a></h1>
+<p>Resource requests and limits, resource quotas and limit range.</p>
+<p>Here we will cover:</p>
+<ul>
+<li>
+<p>Define min and max resources needed to run a container. We just need to
+modify the definition of a pod.</p>
+</li>
+<li>
+<p><code>ResourceQouta</code> constrain resources on a namespace-level.</p>
+</li>
+<li>
+<p><code>LimitRange</code> constrains resource alloc for a single object</p>
+</li>
+</ul>
+<h2 id="resource-units-in-k8s"><a class="header" href="#resource-units-in-k8s">Resource Units in K8s</a></h2>
+<p>K8s measures: CPU in millicores and memory resource in bytes.</p>
+<p>1 CPU unit is equivalent to 1 physical CPU core, or 1 virtual core, depending
+on whether the node is a physical host or a virtual machine running inside a
+physical machine.</p>
+<h2 id="container-resource-request-min"><a class="header" href="#container-resource-request-min">Container Resource Request (min)</a></h2>
+<p>You can define the min amount of resources needed to run an app via
+<code>spec.containers[].resources.requests</code></p>
+<p>These resources include: cpu, memory, huge page, ephemeral storage</p>
+<p>This limits influence if the pod can be scheduled or not, you might see these
+messages: <code>PodExceedsFreeCPU</code> or <code>PodExceedsFreeMemory</code>.</p>
+<p>The options available are:</p>
+<ul>
+<li><code>spec.containers[].resources.requests</code>
+<ul>
+<li><code>cpu</code>: eg 500m</li>
+<li><code>memory</code>: eg 64Mi</li>
+<li><code>hugepages-&lt;size&gt;</code>: eg 60Mi</li>
+<li><code>ephemeral-storage</code>: eg 4Gi</li>
+</ul>
+</li>
+</ul>
+<h2 id="container-resource-limits-max"><a class="header" href="#container-resource-limits-max">Container Resource Limits (max)</a></h2>
+<p>Can be defined in <code>spec.containers[].resources.limits</code></p>
+<p>These resources include: cpu, memory, huge page, ephemeral storage</p>
+<p>Container runtime decides how to handle situation where app exceeds alloc
+capacity. (Maybe kill the container)</p>
+<ul>
+<li><code>spec.containers[].resources.limits</code>
+<ul>
+<li><code>cpu</code>: eg 500m</li>
+<li><code>memory</code>: eg 64Mi</li>
+<li><code>hugepages-&lt;size&gt;</code>: eg 60Mi</li>
+<li><code>ephemeral-storage</code>: eg 4Gi</li>
+</ul>
+</li>
+</ul>
+<h2 id="resourcequota"><a class="header" href="#resourcequota">ResourceQuota</a></h2>
+<p>This is a k8s primitive, it defines resources constrains for an specific
+namespace. This is usually done by the admin.</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: my-quota
+  namespace: this-ns
+spec:
+  hard:
+    pods: "2"
+    requests.cpu: "2"
+    requests.memory: 1024Mi
+    limits.cpu: 4
+    limits.memory: 4096Mi
+</code></pre>
+<p>If the there is a resource quota, then all the resources it covers must define
+<code>limits</code> and <code>requests</code> so the resource quota can do the math. It wont allow us
+to create the objs otherwise.</p>
+<h2 id="limitrange"><a class="header" href="#limitrange">LimitRange</a></h2>
+<p>So basically <code>resourcequota</code> is for namespaces, but you can micro manage it
+more with limit ranges you can specify for each object within a namespaces the
+resource allocation.</p>
+<p>You can apply default values that will be set if no explicit declaration is set
+in the specific object manifest. As well as global min and max.</p>
+<p>For example this will</p>
+<pre><code>apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-resource-constraint
+spec:
+  limits:
+  - default: # this section defines default limits
+      cpu: 500m
+    defaultRequest: # this section defines default requests
+      cpu: 500m
+    max: # max and min define the limit range
+      cpu: "1"
+    min:
+      cpu: 100m
+    type: Container
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="configmaps-and-secrets"><a class="header" href="#configmaps-and-secrets">Configmaps and Secrets</a></h1>
+<p>K8s primitives for configuration data that we can inject into a pod.</p>
+<p>They have some characteristics:</p>
+<ul>
+<li>stores as key pair values.</li>
+<li>stored decoupled from consuming pod</li>
+<li>configmap: plain text values for config apps, flags, URLs, etc.</li>
+<li>secret: Base64-enconded values, for API keys or SSL certificates. The values
+are not encrypted.</li>
+<li>they are stored in <code>etcd</code> unencrypted, but you can encrypt them if you want.</li>
+</ul>
+<p>Once we create the object we can mount is as a volume or as env variables.</p>
+<h2 id="imperative-approach"><a class="header" href="#imperative-approach">Imperative Approach</a></h2>
+<pre><code class="language-bash">k create configmap db-config --from-literal=db=staging
+</code></pre>
+<p>you have multiple options:</p>
+<pre><code class="language-bash">--from-env-file=config.env
+--from-file=app-config.json
+--from-file=some-dir # a dir
+</code></pre>
+<p>Once you create it, you can  mount it in a pod like this:</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: env-configmap
+spec:
+  containers:
+    - name: app
+      command: ["/bin/sh", "-c", "printenv"]
+      image: busybox:latest
+      envFrom:
+        - configMapRef:
+            name: myconfigmap
+</code></pre>
+<p>You can also get specific keys from a configmap using <code>configMapKeyRef</code></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: env-configmap
+spec:
+  containers:
+    - name: app
+      command: ["/bin/sh", "-c", "printenv"]
+      image: busybox:latest
+      env:
+      - name: DATABASE_URL
+        valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: database_url
+</code></pre>
+<p>In this example we are using the key <code>database_url</code> from the config map
+<code>backend-config</code> and setting it in the env as <code>DATABASE_URL</code> in caps.</p>
+<h2 id="consuming-changed-configmap-data"><a class="header" href="#consuming-changed-configmap-data">Consuming Changed ConfigMap Data</a></h2>
+<p>Containers will not refresh data upon a change. You would have to develop that
+on your app, like refresh the env variables periodically or on-demand.</p>
+<h2 id="secrets"><a class="header" href="#secrets">Secrets</a></h2>
+<p>There are these secrets:</p>
+<ul>
+<li><code>generic</code>, creates a secret from a file, directory or literal value</li>
+<li><code>docker-registry</code>, creates a secret for a docker registry</li>
+<li><code>tls</code>, creates a tls secret</li>
+</ul>
+<p>Imperative commands</p>
+<pre><code>k create secret generic db-creds --from-literal=pwd=s3cre
+</code></pre>
+<p>Also we have specialized secret types, they are set using the <code>--type</code>
+attribute in manifest.</p>
+<ul>
+<li><code>kubernets.io/basic-auth</code>, credentials for basic auth</li>
+<li><code>kubernets.io/ssh-auth</code>, credentials for ssh</li>
+<li><code>kubernets.io/service-account-token</code>, serviceaccount token</li>
+<li><code>kubernets.io/token</code>, node bootstrap token data</li>
+</ul>
+<p>If you create a secret yaml by hand you need to encode the value yourself.</p>
+<pre><code class="language-bash">echo -n 's3cre!' | base64
+</code></pre>
+<p>If you don not want to do that you can also provide the data <code>stringData</code> in
+the <code>yaml</code>, and k will encrypt it once you <code>k apply</code> it.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="security-context"><a class="header" href="#security-context">Security Context</a></h1>
+<p>Privilege and access control for a pod. For example This container needs to run
+with a non-root user.</p>
+<p>These are defined in <code>spec.securityContext</code> or
+<code>spec.containers[].securityContext</code>.</p>
+<p>Some attributes on the Pod and container level are the same. Container-level
+ones take precedence.</p>
+<h2 id="defining-container-security"><a class="header" href="#defining-container-security">Defining Container Security</a></h2>
+<p>There is a Security Context API</p>
+<ul>
+<li>PodSecurityContext: pod level security attr.</li>
+<li>SecurityContext: container level security attr.</li>
+</ul>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: busy-security-context
+  name: busy-security-context
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+  containers:
+  - args:
+    - sleep
+    - "1h"
+    image: busybox:1.28
+    name: busy-security-context
+    volumeMounts:
+    - mountPath: /data/test
+      name: volume-empty
+    resources: {}
+  volumes:
+  - name: volume-empty
+    emptyDir: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="services"><a class="header" href="#services">Services</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="troubleshooting-services"><a class="header" href="#troubleshooting-services">Troubleshooting Services</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="ingresses"><a class="header" href="#ingresses">Ingresses</a></h1>
@@ -2003,6 +2216,9 @@ eyJShAthetoken...
 <li><a href="ckad_focus.html#troubleshooting">Troubleshooting</a></li>
 <li><a href="ckad_focus.html#crds">CRDs</a></li>
 <li><a href="ckad_focus.html#authentication-and-authorization">Authentication and Authorization</a></li>
+<li><a href="ckad_focus.html#resource-management">Resource Management</a></li>
+<li><a href="ckad_focus.html#configmaps-and-secrets">ConfigMaps and Secrets</a></li>
+<li><a href="ckad_focus.html#security-context">Security Context</a></li>
 </ul>
 <h2 id="containers"><a class="header" href="#containers">Containers</a></h2>
 <ul>
@@ -2106,6 +2322,31 @@ executable.</li>
 all namespaces.</li>
 <li>We can use the ServiceAccount object to run services against the k8s
 cluster itself. It will auth with RBAC also.</li>
+</ul>
+<h2 id="resource-management-1"><a class="header" href="#resource-management-1">Resource Management</a></h2>
+<ul>
+<li>3 aspects,
+<ul>
+<li>how to define min and max resources for a container.</li>
+<li>resource quota to limit the aggregate resource consumption or limit the
+overall objects created in a namespace</li>
+<li>limit range, constrains of defaults the resources alloc for an specific
+object type.</li>
+</ul>
+</li>
+</ul>
+<h2 id="configmaps-and-secrets-1"><a class="header" href="#configmaps-and-secrets-1">ConfigMaps and Secrets</a></h2>
+<ul>
+<li>Understand the purpose for a configmap against a secret</li>
+<li>Secrets are meant to represent sensitive data. They are not encrypted</li>
+<li>How to define those configmaps and secret objects. How to interact with them.</li>
+</ul>
+<h2 id="security-context-1"><a class="header" href="#security-context-1">Security Context</a></h2>
+<ul>
+<li>The security context lest you provide privilege and access control to
+containers.</li>
+<li>You can define it to the whole pod or to individual containers.</li>
+<li>Know where to find the security attributes. (k8s docs)</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-k8s-up-and-running"><a class="header" href="#-k8s-up-and-running">🐋 k8s up and running</a></h1>
 <blockquote>
@@ -2668,7 +2909,7 @@ Enables you to poll slowly from a slow-starting container, while also
 enabling  responsive liveness checks once the container has initialized</p>
 </li>
 </ul>
-<h2 id="resource-management-1"><a class="header" href="#resource-management-1">Resource Management</a></h2>
+<h2 id="resource-management-2"><a class="header" href="#resource-management-2">Resource Management</a></h2>
 <p>K8s allow you to increase the overall utilization of the machines that are in
 the cluster.</p>
 <p>Utilization is defined as the amount of resource actively being used divided by
@@ -2883,7 +3124,7 @@ spec:
 </code></pre>
 <p>Now each request that is send to the service will be randomly directed to one
 of the pods that implements the service.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="configmaps-and-secrets-1"><a class="header" href="#configmaps-and-secrets-1">ConfigMaps and Secrets</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="configmaps-and-secrets-2"><a class="header" href="#configmaps-and-secrets-2">ConfigMaps and Secrets</a></h1>
 <p>A good practice is to make your container images reusable, making a general
 purpose one that can be used across applications. But we might also need to add
 some configuration to the image at runtime. Here is where ConfigMaps and
@@ -3039,7 +3280,7 @@ spec:
             name: config # &lt;- name of the cm we just created
             key: param2
 </code></pre>
-<h2 id="secrets"><a class="header" href="#secrets">Secrets</a></h2>
+<h2 id="secrets-1"><a class="header" href="#secrets-1">Secrets</a></h2>
 <p>This are pretty similar to ConfigMaps but they are intended for sensitive
 information, for example, passwords, tokens, private keys, TLS certs.</p>
 <p>This secrets are exposed to Pods via explicit declaration in the Pod manifest

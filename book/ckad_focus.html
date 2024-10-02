@@ -189,6 +189,9 @@
 <li><a href="#troubleshooting">Troubleshooting</a></li>
 <li><a href="#crds">CRDs</a></li>
 <li><a href="#authentication-and-authorization">Authentication and Authorization</a></li>
+<li><a href="#resource-management">Resource Management</a></li>
+<li><a href="#configmaps-and-secrets">ConfigMaps and Secrets</a></li>
+<li><a href="#security-context">Security Context</a></li>
 </ul>
 <h2 id="containers"><a class="header" href="#containers">Containers</a></h2>
 <ul>
@@ -292,6 +295,31 @@ executable.</li>
 all namespaces.</li>
 <li>We can use the ServiceAccount object to run services against the k8s
 cluster itself. It will auth with RBAC also.</li>
+</ul>
+<h2 id="resource-management"><a class="header" href="#resource-management">Resource Management</a></h2>
+<ul>
+<li>3 aspects,
+<ul>
+<li>how to define min and max resources for a container.</li>
+<li>resource quota to limit the aggregate resource consumption or limit the
+overall objects created in a namespace</li>
+<li>limit range, constrains of defaults the resources alloc for an specific
+object type.</li>
+</ul>
+</li>
+</ul>
+<h2 id="configmaps-and-secrets"><a class="header" href="#configmaps-and-secrets">ConfigMaps and Secrets</a></h2>
+<ul>
+<li>Understand the purpose for a configmap against a secret</li>
+<li>Secrets are meant to represent sensitive data. They are not encrypted</li>
+<li>How to define those configmaps and secret objects. How to interact with them.</li>
+</ul>
+<h2 id="security-context"><a class="header" href="#security-context">Security Context</a></h2>
+<ul>
+<li>The security context lest you provide privilege and access control to
+containers.</li>
+<li>You can define it to the whole pod or to individual containers.</li>
+<li>Know where to find the security attributes. (k8s docs)</li>
 </ul>
 
                     </main>
