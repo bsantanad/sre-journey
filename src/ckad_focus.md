@@ -121,3 +121,30 @@
   containers.
 - You can define it to the whole pod or to individual containers.
 - Know where to find the security attributes. (k8s docs)
+
+## Services
+
+- Pod to Pod communication should not be performed with the pod virtual ip
+  address, due to it changing.
+- We can expose the `svc`s between the pods with `clusterip` or expose it with
+  `nodeport`. We can also expose them to a `loadbalancer`
+
+## Troubleshooting Services
+
+- Check for misconfiguration. The `k get endpoints` is a good ally.
+- Check labels
+- Check outgoing ports
+- Make sure the app running inside the pod works.
+
+
+## Ingresses
+
+- Ingress routes http traffic towards one or many services.
+- Ingress doesn't work without an ingress controller
+- Configuring TLS is not req for the exam
+
+## Network Policy
+
+- Restrictions for pods talking to each other.
+- Its best practice to create a deny all policy.
+- You can then go ahead and open access, pod by pod.

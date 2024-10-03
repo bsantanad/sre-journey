@@ -27,6 +27,7 @@
             - [Resource Management](./ckad_prep_17.md)
             - [Configmaps and Secrets](./ckad_prep_18.md)
             - [Security Context](./ckad_prep_19.md)
+        - [🦕 Services & Networking](./ckad_prep_fifth.md)
             - [Services](./ckad_prep_20.md)
             - [Troubleshooting Services](./ckad_prep_21.md)
             - [Ingresses](./ckad_prep_22.md)
